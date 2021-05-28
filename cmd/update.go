@@ -1,12 +1,10 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
-	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/thetillhoff/eac/internal/app"
+	"github.com/thetillhoff/eac/pkg/apps"
 )
 
 // updateCmd represents the update command
@@ -17,16 +15,15 @@ var updateCmd = &cobra.Command{
 	eac update app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, arg := range args {
-			appItem := app.NewApp(arg)
-
-			out, err := app.Update(appItem)
-			out = strings.TrimSuffix(out, "\n")
-			fmt.Println(out)
-			if err != nil {
-				log.Fatal(err)
-			}
+		dryRun, err := cmd.Flags().GetBool("dry-run")
+		if err != nil {
+			log.Fatalln("There was an error while reading the flag 'dry-run':\n" + err.Error())
 		}
+		skipLocal, err := cmd.Flags().GetBool("skip-local")
+		if err != nil {
+			log.Fatalln("There was an error while reading the flag 'skip-local':\n" + err.Error())
+		}
+		apps.Update(args, shell, appsDirPath, continueOnError, versionsFilePath, dryRun, skipLocal)
 	},
 }
 
@@ -43,6 +40,7 @@ func init() {
 	// is called directly, e.g.:
 	// updateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	//TODO --no-save-version: don't store/update version in settings.yaml. Only makes sense when combined with some install option. Maybe `install --update --no-save-version` or `install --latest --no-save-version`?
-	//TODO add --version for each app ...
+	updateCmd.Flags().Bool("dry-run", false, "Output potential upgrades, but don't make them.")
+	updateCmd.Flags().Bool("skip-local", false, "Skip checking local version.")
+	//TODO --dry-run: don't store/update version in settings.yaml. Only makes sense when combined with some install option. Maybe `install --update --no-save-version` or `install --latest --no-save-version`?
 }

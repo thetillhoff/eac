@@ -1,12 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-	"log"
-	"strings"
-
 	"github.com/spf13/cobra"
-	"github.com/thetillhoff/eac/internal/app"
+	"github.com/thetillhoff/eac/pkg/apps"
 )
 
 // configureCmd represents the configure command
@@ -17,22 +13,7 @@ var configureCmd = &cobra.Command{
 	eac configure app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, arg := range args {
-			appItem := app.NewApp(arg)
-
-			// test if get-local-version works (to check if app is already installed), if not, fail (with custom error?) //TODO: create custom error message
-			_, err := app.GetLocalVersion(appItem)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			out, err := app.Configure(appItem)
-			out = strings.TrimSuffix(out, "\n")
-			fmt.Println(out)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+		apps.Configure(args, shell, appsDirPath, continueOnError)
 	},
 }
 

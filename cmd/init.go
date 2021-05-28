@@ -1,48 +1,14 @@
 package cmd
 
 import (
-	"bufio"
-	"fmt"
+	"io"
 	"log"
 	"os"
-	"path"
+	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/thetillhoff/eac/pkg/apps"
 )
-
-var eacAppFiles = map[string]map[string]string{
-	"linux": {
-		"configure.sh": `#/bin/sh
-echo "This script is called to configure of app %v"`,
-		"getLatestVersion.sh": `#/bin/sh
-echo "This script is called to getLatestVersion of app %v"`,
-		"getLocalVersion.sh": `#/bin/sh
-echo "This script is called to getLocalVersion of app %v"`,
-		"install.sh": `#/bin/sh
-echo "This script is called to install of app %v"`,
-		"uninstall.sh": `#/bin/sh
-echo uninstall %v`,
-	},
-	"darwin": {
-		"configure.sh": `#/bin/sh
-echo "This script is called to configure of app %v"`,
-		"getLatestVersion.sh": `#/bin/sh
-echo "This script is called to getLatestVersion of app %v"`,
-		"getLocalVersion.sh": `#/bin/sh
-echo "This script is called to getLocalVersion of app %v"`,
-		"install.sh": `#/bin/sh
-echo "This script is called to install of app %v"`,
-		"uninstall.sh": `#/bin/sh
-echo "This script is called to uninstall of app %v"`,
-	},
-	"windows": {
-		"configure.ps1":        `Write-Host "This script is called to configure of app %v"`,
-		"getLatestVersion.ps1": `Write-Host "This script is called to getLatestVersion of app %v"`,
-		"getLocalVersion.ps1":  `Write-Host "This script is called to getLocalVersion of app %v"`,
-		"install.ps1":          `Write-Host "This script is called to install of app %v"`,
-		"uninstall.ps1":        `Write-Host "This script is called to uninstall of app %v"`,
-	},
-}
 
 // initCmd represents the init command
 var initCmd = &cobra.Command{
@@ -52,61 +18,33 @@ var initCmd = &cobra.Command{
   eac init`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		if _, err := os.Stat(appsPath); os.IsNotExist(err) {
-			err := os.Mkdir(appsPath, os.ModePerm)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			log.Println("Created '" + appsPath + "' folder.")
-		} else if err == nil {
-			log.Fatalln("Folder '" + appsPath + "' already exists.") //TODO don't fail here, but check if the folder is empty or not and fail or continue based on that.
-		} else {
-			log.Fatalln(err)
-		}
-
-		appName := "eac"
-
-		appPath := path.Join(appsPath, appName)
-		err := os.Mkdir(appPath, os.ModePerm) // since parent folder is either freshly created or checked for emptiness at this point, no further checking is required
+		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatalln("There was an error while reading the flag 'platform':\n" + err.Error())
 		}
-		log.Println("Created '" + appPath + "' folder.")
 
-		for platform := range eacAppFiles {
-			platformPath := path.Join(appPath, platform)
-			if _, err := os.Stat(platformPath); os.IsNotExist(err) {
-				err := os.Mkdir(platformPath, os.ModePerm) // ignore errors
-				if err != nil {
-					log.Fatalln(err)
-				}
-				log.Println("Created '" + platformPath + "' folder.")
-			} else if err == nil {
-				fmt.Println("Platform '" + platform + "' for app '" + appName + "' does already exist.")
-			} else {
-				log.Fatalln(err)
+		if _, err := os.Stat(appsDirPath); os.IsNotExist(err) {
+			err := os.Mkdir(appsDirPath, os.ModePerm)
+			if err != nil {
+				log.Fatalln("Couldn't create appsDir at '" + appsDirPath + "':\n" + err.Error())
 			}
-
-			platformDemoFiles := demoFiles[platform]
-
-			for filename, fileContent := range platformDemoFiles {
-				f, err := os.Create(path.Join(platformPath, filename))
-				if err != nil {
-					log.Fatalln(err)
-				}
-				defer f.Close()
-
-				w := bufio.NewWriter(f)
-
-				_, err = fmt.Fprint(w, fileContent)
-				if err != nil {
-					log.Fatalln(err)
-				}
-
-				w.Flush()
-				log.Println("Created '" + path.Join(platformPath, filename) + "' file.")
+			log.Println("Created '" + appsDirPath + "' folder.")
+		} else if err == nil {
+			appsDir, err := os.Open(appsDirPath) // open appsDir to check if it's empty
+			if err != nil {
+				log.Fatalln("There was a problem opening appsDir at '" + appsDirPath + "':\n" + err.Error())
 			}
+			defer appsDir.Close()
+
+			_, err = appsDir.Readdirnames(1)
+			if err != io.EOF { // check if appsDir is empty
+				log.Fatalln("Folder '" + appsDirPath + "' isn't empty or another problem occured while accessing it:\n" + err.Error())
+			}
+		} else {
+			log.Fatalln("There was a problem while accessing appsDir at '" + appsDirPath + "':\n" + err.Error())
 		}
+
+		apps.Create([]string{"eac"}, flaggedPlatforms, shell, appsDirPath, continueOnError)
 	},
 }
 
@@ -122,4 +60,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// initCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	initCmd.Flags().StringSliceP("platform", "p", []string{}, "Only create demo files for specified platforms. Valid options are ["+strings.Join(apps.ValidPlatforms(), "|")+"]")
 }

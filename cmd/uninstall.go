@@ -1,12 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-	"log"
-	"strings"
-
 	"github.com/spf13/cobra"
-	"github.com/thetillhoff/eac/internal/app"
+	"github.com/thetillhoff/eac/pkg/apps"
 )
 
 // uninstallCmd represents the uninstall command
@@ -17,16 +13,7 @@ var uninstallCmd = &cobra.Command{
 	eac update app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, arg := range args {
-			appItem := app.NewApp(arg)
-
-			out, err := app.Uninstall(appItem)
-			out = strings.TrimSuffix(out, "\n")
-			fmt.Println(out)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+		apps.Uninstall(args, shell, appsDirPath, continueOnError) // Uninstall apps
 	},
 }
 
@@ -43,5 +30,5 @@ func init() {
 	// is called directly, e.g.:
 	// uninstallCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	//TODO: installCmd.Flags().Bool("force", false, "Force uninstallation of *all* apps. Use with caution.") //TODO implementation
+	//TODO: uninstallCmd.Flags().Bool("force", false, "Force uninstallation of *all* apps. Use with caution.")
 }

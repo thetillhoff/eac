@@ -1,137 +1,63 @@
 package app
 
 import (
-	"bufio"
-	"errors"
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path"
-	"runtime"
 	"strings"
 )
 
-var (
-	platform               = runtime.GOOS // name of the current platform. Folder or symlink with equal name must exist in apps/<appname>/.
-	shell           string = "/bin/sh"    // default
-	continueOnError bool   = false        // default
-)
-
-type App struct {
-	name                   string // name of the app (must be equal to folder name)
-	getLocalVersionScript  string // script that checks whether the app is installed and if yes, in which version
-	installScript          string // script that runs the installation of the app
-	configureScript        string // script that configures the app (if installed)
-	getLatestVersionScript string // script that checks for new versions of the app
-	uninstallScript        string // script that uninstalls the app
-	continueOnError        bool   // if true, only this app will be skipped
-	shell                  string // set specific shell to use for the scripts of this app
+func (app App) WantedVersion() string {
+	return app.wantedVersion
 }
 
-// New creates a new App with some default settings.
-func NewApp(name string) App {
-	return App{
-		name:                   name,
-		getLocalVersionScript:  "get-local-version.sh",
-		installScript:          "install.sh",
-		configureScript:        "configure.sh",
-		getLatestVersionScript: "get-latest-version.sh",
-		uninstallScript:        "uninstall.sh",
-		continueOnError:        continueOnError,
-		shell:                  shell,
-	}
+func (app App) LocalVersion() string {
+	return app.localVersion
 }
 
-func GetLocalVersion(app App) (string, error) {
-	return RunScript(app.shell, app.name, app.getLocalVersionScript, app.continueOnError)
-}
-
-func GetLatestVersion(app App) (string, error) {
-	return RunScript(app.shell, app.name, app.getLatestVersionScript, app.continueOnError)
-}
-
-func Install(app App) (string, error) {
-	return RunScript(app.shell, app.name, app.installScript, app.continueOnError)
-}
-
-func Configure(app App) (string, error) {
-	return RunScript(app.shell, app.name, app.configureScript, app.continueOnError)
-}
-
-func Uninstall(app App) (string, error) {
-	return RunScript(app.shell, app.name, app.uninstallScript, app.continueOnError)
-}
-
-func Update(app App) (string, error) {
-	fmt.Println("Checking " + app.name + " version ...")
-	localVersion, err := GetLocalVersion(app)
+// This will either return the local version or an empty string (when the script for getting the local version failed, f.e. if the app is not installed)
+func (app App) getLocalVersion(platform string) string {
+	localVersion, err := RunScript(app.shell, app.Name, platform, app.getLocalVersionScript, app.continueOnError)
 	if err != nil {
-		return "", err
+		log.Println("App '" + app.Name + "' is not installed.")
+		localVersion = ""
 	}
-	if localVersion == "" {
-		return "", errors.New("Retrieval of local version of app '" + app.name + "' failed.")
-	}
-	localVersion = strings.TrimSuffix(localVersion, "\n") // remove line-break after content
+	return localVersion
+}
 
-	latestVersion, err := GetLatestVersion(app)
+func (app App) GetLatestVersion(platform string) string {
+	latestVersion, err := RunScript(app.shell, app.Name, platform, app.getLatestVersionScript, app.continueOnError)
 	if err != nil {
-		return "", err
+		log.Fatalln("There was an error while retrieving the latest version of app '" + app.Name + "':\n" + err.Error())
 	}
-	if latestVersion == "" {
-		return "", errors.New("Retrieval of latest version of app '" + app.name + "' failed.")
-	}
-	latestVersion = strings.TrimSuffix(latestVersion, "\n") // remove line-break after content
-
-	if localVersion == latestVersion {
-		return "Already installed with the latest version (v" + localVersion + ").", nil
-	} else {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("Do you want to update from v" + localVersion + " to v" + latestVersion + "? [y/n] ")
-		text, err := reader.ReadString('\n')
-		if err != nil {
-			return "", err
-		}
-		text = strings.TrimSuffix(text, "\n") // remove line-break after input
-		if text == "y" {
-			//TODO: parse version file, update version of app, save yaml back to file
-			return "Updated from v" + localVersion + " to v" + latestVersion + ".", nil
-		} else {
-			return "Skipped " + app.name + ".", nil
-		}
-	}
+	return latestVersion
 }
 
-func Validate(app App) (string, error) {
-	out := ""
-
-	scriptpaths := []string{}
-	scriptpaths = append(scriptpaths, path.Join("apps", app.name, platform, app.getLocalVersionScript))
-	scriptpaths = append(scriptpaths, path.Join("apps", app.name, platform, app.installScript))
-	scriptpaths = append(scriptpaths, path.Join("apps", app.name, platform, app.configureScript))
-	scriptpaths = append(scriptpaths, path.Join("apps", app.name, platform, app.getLatestVersionScript))
-	scriptpaths = append(scriptpaths, path.Join("apps", app.name, platform, app.uninstallScript))
-
-	missingFiles := testFiles(scriptpaths...)
-
-	if len(missingFiles) == 0 {
-		out = out + "The scripts for '" + app.name + "' exist.\n"
-	} else {
-		err := "The following files for '" + app.name + "' don't seem to exist:\n"
-		for _, missingFile := range missingFiles {
-			err = err + missingFile + "\n"
+func (app App) Install(platform string, latest bool) (string, error) { //TODO add parameter version of type string and pass it to the script as arg.
+	if latest {
+		latestVersion := app.GetLatestVersion(platform)
+		if latestVersion == "" {
+			log.Fatalln("There was an error while retrieving the latest versin of app '" + app.Name + "'.")
 		}
-		return "", errors.New(err)
+		app.wantedVersion = latestVersion
 	}
-
-	//TODO check whether get-latest-version and get-local-version return single line strings
-
-	return out, nil
+	return RunScript(app.shell, app.Name, platform, app.installScript, app.continueOnError)
 }
 
-func RunScript(appshell string, appname string, script string, appcontinueOnError bool) (string, error) {
-	cmd := exec.Command(appshell, path.Join("apps", appname, platform, script))
-	out, err := cmd.CombinedOutput()
-	return string(out), err
+func (app App) Configure(platform string) (string, error) {
+	return RunScript(app.shell, app.Name, platform, app.configureScript, app.continueOnError)
+}
+
+func (app App) Uninstall(platform string) (string, error) {
+	return RunScript(app.shell, app.Name, platform, app.uninstallScript, app.continueOnError)
+}
+
+func RunScript(shell string, appName string, platform string, script string, appcontinueOnError bool) (string, error) {
+	cmd := exec.Command(shell, path.Join("apps", appName, script))
+	outbytes, err := cmd.CombinedOutput()
+	out := strings.TrimSuffix(string(outbytes), "\n")
+	return out, err
 }
 
 func testFiles(filepaths ...string) []string {

@@ -1,11 +1,9 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
-	"strings"
 
-	"github.com/thetillhoff/eac/internal/app"
+	"github.com/thetillhoff/eac/pkg/apps"
 
 	"github.com/spf13/cobra"
 )
@@ -20,28 +18,18 @@ var installCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		noConfigure, err := cmd.Flags().GetBool("no-configure")
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatalln("There was an error while reading the flag 'no-configure':\n" + err.Error())
+		}
+		update, err := cmd.Flags().GetBool("update")
+		if err != nil {
+			log.Fatalln("There was an error while reading the flag 'update':\n" + err.Error())
+		}
+		latest, err := cmd.Flags().GetBool("latest")
+		if err != nil {
+			log.Fatalln("There was an error while reading the flag 'latest':\n" + err.Error())
 		}
 
-		for _, arg := range args {
-			appItem := app.NewApp(arg)
-			out, err := app.Install(appItem)
-			out = strings.TrimSuffix(out, "\n")
-			fmt.Println(out)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			if !noConfigure {
-				out, err := app.Configure(appItem)
-				out = strings.TrimSuffix(out, "\n")
-				fmt.Println(out)
-				if err != nil {
-					log.Fatal(err)
-				}
-			}
-		}
-
+		apps.Install(args, noConfigure, update, shell, appsDirPath, continueOnError, versionsFilePath, latest) // Install apps
 	},
 }
 
@@ -58,6 +46,10 @@ func init() {
 	// is called directly, e.g.:
 	// installCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	installCmd.Flags().Bool("no-configure", false, "Don't run app configuration after their installation") //TODO implementation
-	installCmd.Flags().BoolP("update", "u", false, "Update app versions before installation")              //TODO implementation
+	installCmd.Flags().Bool("no-configure", false, "Don't run app configuration after their installation")
+	installCmd.Flags().BoolP("update", "u", false, "Update app versions before installation")
+
+	installCmd.Flags().BoolP("latest", "l", false, "Install latest versions of apps, no matter which versions are specified anywhere.")
+
+	//TODO add flag for multiple versionsFilePaths
 }

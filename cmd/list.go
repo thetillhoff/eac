@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
+	"github.com/thetillhoff/eac/pkg/apps"
 )
 
 // listCmd represents the list command
@@ -12,8 +13,17 @@ var listCmd = &cobra.Command{
 	Short: "List all available apps.",
 	Long: `List all available apps, with their respective version. Call with
 	eac list`,
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("list called") //TODO
+		noVersion, err := cmd.Flags().GetBool("no-version")
+		if err != nil {
+			log.Fatalln("There was an error while reading the flag 'no-version':\n" + err.Error())
+		}
+		seperator, err := cmd.Flags().GetString("seperator")
+		if err != nil {
+			log.Fatalln("There was an error while reading the flag 'seperator':\n" + err.Error())
+		}
+		apps.List(appsDirPath, versionsFilePath, noVersion, seperator)
 	},
 }
 
@@ -30,6 +40,6 @@ func init() {
 	// is called directly, e.g.:
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	//TODO --no-version: don't list version
-	//TODO --seperator: override newline char with something else (string, not char)
+	listCmd.Flags().Bool("no-version", false, "Don't show versions of apps.")
+	listCmd.Flags().String("seperator", "\n", "Change seperator, default to \\n.")
 }

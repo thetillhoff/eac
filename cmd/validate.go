@@ -1,12 +1,11 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/thetillhoff/eac/internal/app"
+	"github.com/thetillhoff/eac/pkg/apps"
 )
 
 // validateCmd represents the validate command
@@ -17,16 +16,12 @@ var validateCmd = &cobra.Command{
 	eac validate app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, arg := range args {
-			appItem := app.NewApp(arg)
-
-			out, err := app.Validate(appItem)
-			out = strings.TrimSuffix(out, "\n")
-			fmt.Println(out)
-			if err != nil {
-				log.Fatal(err)
-			}
+		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
+		if err != nil {
+			log.Fatalln("There was an error while reading the flag 'platform':\n" + err.Error())
 		}
+
+		apps.Validate(args, flaggedPlatforms, shell, appsDirPath, continueOnError)
 	},
 }
 
@@ -42,4 +37,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// validateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	validateCmd.Flags().StringSliceP("platform", "p", []string{}, "Only create demo files for specified platforms. Valid options are ["+strings.Join(apps.ValidPlatforms(), "|")+"]")
 }
