@@ -23,9 +23,10 @@ So when I again searched for some stupid installation commands, I bore the idea 
 ## The vision
 
 eac's goal is to
-- be a simple app management tool,
+- be a simple app management tool - simple as in simple to understand and simple to use,
+- make it easy to install a specific version of a software,
 - make the same apps available on all (or at least the most important) platforms in the same way,
-- enable me to use shell-scripts for each installation, configuration, uninstallation, ... - I mean the installation-instructions are already given by the app developers, why would you require users to migrate those commands to another format (and then probably format them back to the initial commands)?
+- enable me to use shell commands (or even better: shell-scripts) for each installation, configuration, uninstallation, ... - I mean the installation-instructions are already given by the app developers, why would you require users to migrate those commands to another format (and then probably format them back to the initial commands)?
 
 
 ## The name
@@ -40,9 +41,14 @@ I wanted a short name and it should be unique, too. The meaning of "iac" is basi
 > "My" in the following context means the owner(s)/author(s)/member(s) of this tool. Currently this is only me and I think its easier to write from my point of view anyway.
 
 - Create/add some example apps
+- add `install --self` and `uninstall --self` commands for eac self-management
+- Make it possible to upgrade currently not installed apps, without trying to get a local version to compare to. -> compare only against versionsFile
+- Make it possible to install apps without adding their version to the versionsFile - and with it. (Currently the versionsFile is never edited.)
 - Resolve `//TODO`s. There are quite a lot.
+- Should it be 'appsDirPath/platform/appName' or 'appsDirPath/appName/platform'? Currently it is the latter.
 - Write Tests.
 - Check & test how eac behaves with settings files.
+- Create github actions for tests, release
 - Create initial release (f.e. 0.0.1).
 - Write proper documentation - as of now, the tool is "self-documenting" as every command has its own help-message and example. Probably not sufficient though.
 - Add `snapshot` command, which tries to gather all installed apps and their respective settings, so the initial setup will be easier and it will simplify migration between machines (limited to the same platform, so switching between linux and windows won't be covered here - sorry). Improvement: exclude an app, only list(==print) found apps.
