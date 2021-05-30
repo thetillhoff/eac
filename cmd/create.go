@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"log"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/thetillhoff/eac/pkg/apps"
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 // createCmd represents the create command
@@ -18,7 +18,7 @@ var createCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
-			log.Fatalln("There was an error while reading the flag 'platform':\n" + err.Error())
+			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
 		apps.Create(args, flaggedPlatforms, shell, appsDirPath, continueOnError)

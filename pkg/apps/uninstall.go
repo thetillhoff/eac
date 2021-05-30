@@ -1,9 +1,9 @@
 package apps
 
 import (
-	"fmt"
-	"log"
 	"runtime"
+
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 func Uninstall(appNames []string, shell string, appsDirPath string, continueOnError bool) {
@@ -11,10 +11,10 @@ func Uninstall(appNames []string, shell string, appsDirPath string, continueOnEr
 	apps := apps(appNames, shell, continueOnError)
 
 	for _, appItem := range apps {
-		out, err := appItem.Uninstall(runtime.GOOS)
-		fmt.Println(out)
+		out, err := appItem.Uninstall(appsDirPath, runtime.GOOS)
+		logs.Info("Output of configuration script:", out)
 		if err != nil {
-			log.Fatal(err)
+			logs.Err("There was an error during uninstallation of app '"+appItem.Name+"':", err)
 		}
 	}
 }

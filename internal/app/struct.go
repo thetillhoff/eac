@@ -76,12 +76,12 @@ func WantedVersion(s string) AppOption {
 func New(appName string, options ...AppOption) *App {
 
 	appItem := &App{ // initialize with default values
-		shell:                  "/bin/sh",
+		shell:                  "/bin/sh -c",
 		Name:                   appName,
-		getLocalVersionScript:  "get-local-version.sh",
+		getLocalVersionScript:  "getLocalVersion.sh",
 		installScript:          "install.sh",
 		configureScript:        "configure.sh",
-		getLatestVersionScript: "get-latest-version.sh",
+		getLatestVersionScript: "getLatestVersion.sh",
 		uninstallScript:        "uninstall.sh",
 		continueOnError:        false,
 		wantedVersion:          "",

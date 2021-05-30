@@ -1,9 +1,8 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/thetillhoff/eac/pkg/apps"
+	"github.com/thetillhoff/eac/pkg/logs"
 
 	"github.com/spf13/cobra"
 )
@@ -18,15 +17,15 @@ var installCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		noConfigure, err := cmd.Flags().GetBool("no-configure")
 		if err != nil {
-			log.Fatalln("There was an error while reading the flag 'no-configure':\n" + err.Error())
+			logs.Err("There was an error while reading the flag 'no-configure':", err)
 		}
 		update, err := cmd.Flags().GetBool("update")
 		if err != nil {
-			log.Fatalln("There was an error while reading the flag 'update':\n" + err.Error())
+			logs.Err("There was an error while reading the flag 'update':", err)
 		}
 		latest, err := cmd.Flags().GetBool("latest")
 		if err != nil {
-			log.Fatalln("There was an error while reading the flag 'latest':\n" + err.Error())
+			logs.Err("There was an error while reading the flag 'latest':", err)
 		}
 
 		apps.Install(args, noConfigure, update, shell, appsDirPath, continueOnError, versionsFilePath, latest) // Install apps

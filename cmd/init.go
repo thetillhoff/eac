@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"io"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/thetillhoff/eac/pkg/apps"
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 // initCmd represents the init command
@@ -20,28 +20,28 @@ var initCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
-			log.Fatalln("There was an error while reading the flag 'platform':\n" + err.Error())
+			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
 		if _, err := os.Stat(appsDirPath); os.IsNotExist(err) {
 			err := os.Mkdir(appsDirPath, os.ModePerm)
 			if err != nil {
-				log.Fatalln("Couldn't create appsDir at '" + appsDirPath + "':\n" + err.Error())
+				logs.Err("Couldn't create appsDir at '"+appsDirPath+"':", err)
 			}
-			log.Println("Created '" + appsDirPath + "' folder.")
+			logs.Info("Created '" + appsDirPath + "' folder.")
 		} else if err == nil {
 			appsDir, err := os.Open(appsDirPath) // open appsDir to check if it's empty
 			if err != nil {
-				log.Fatalln("There was a problem opening appsDir at '" + appsDirPath + "':\n" + err.Error())
+				logs.Err("There was a problem opening appsDir at '"+appsDirPath+"':", err)
 			}
 			defer appsDir.Close()
 
 			_, err = appsDir.Readdirnames(1)
 			if err != io.EOF { // check if appsDir is empty
-				log.Fatalln("Folder '" + appsDirPath + "' isn't empty or another problem occured while accessing it:\n" + err.Error())
+				logs.Err("Folder '"+appsDirPath+"' isn't empty or another problem occured while accessing it:", err)
 			}
 		} else {
-			log.Fatalln("There was a problem while accessing appsDir at '" + appsDirPath + "':\n" + err.Error())
+			logs.Err("There was a problem while accessing appsDir at '"+appsDirPath+"':", err)
 		}
 
 		apps.Create([]string{"eac"}, flaggedPlatforms, shell, appsDirPath, continueOnError)

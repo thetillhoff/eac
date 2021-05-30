@@ -1,10 +1,10 @@
 package apps
 
 import (
-	"fmt"
 	"io/ioutil"
-	"log"
 	"strings"
+
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 func List(appsDirPath string, versionsFilePath string, noVersion bool, seperator string) {
@@ -12,7 +12,7 @@ func List(appsDirPath string, versionsFilePath string, noVersion bool, seperator
 
 	files, err := ioutil.ReadDir(appsDirPath)
 	if err != nil {
-		log.Fatalln("There was an error while reading from appsDir at '" + appsDirPath + "':\n" + err.Error())
+		logs.Err("There was an error while reading from appsDir at '"+appsDirPath+"':", err)
 	}
 
 	items := []string{}
@@ -22,6 +22,6 @@ func List(appsDirPath string, versionsFilePath string, noVersion bool, seperator
 		} else {
 			items = append(items, file.Name()+"=="+getVersion(file.Name()))
 		}
-		fmt.Println(strings.Join(items, seperator))
+		logs.Info(strings.Join(items, seperator))
 	}
 }

@@ -1,8 +1,9 @@
 package apps
 
 import (
-	"fmt"
 	"runtime"
+
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 func IsValidPlatform(potentialPlatform string) bool {
@@ -31,7 +32,7 @@ func ResolvePlatforms(flaggedPlatforms []string) []string {
 		}
 		if flaggedPlatform == "all" {
 			if len(platforms) > 0 {
-				fmt.Println("You set platfroms to all, ignoring other specified platforms.")
+				logs.Warn("You set platfroms to all, ignoring other specified platforms.")
 			}
 			platforms = ValidPlatforms()
 			continue

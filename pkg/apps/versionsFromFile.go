@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/thetillhoff/eac/internal/app"
+	"github.com/thetillhoff/eac/pkg/logs"
 	"gopkg.in/yaml.v3"
 )
 
@@ -27,7 +27,7 @@ func loadVersions(filepath string) {
 	var mapObject map[string]interface{}
 	fileContents, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		log.Fatalln("There was an error while accessing the versionsFile at '" + filepath + "':\n" + err.Error())
+		logs.Err("There was an error while accessing the versionsFile at '"+filepath+"':", err)
 	}
 	yaml.Unmarshal([]byte(fileContents), &mapObject)
 
@@ -37,30 +37,30 @@ func loadVersions(filepath string) {
 		if value, ok := value.(string); ok {
 			checkedMap[key] = value
 		} else {
-			log.Fatalln("The version '" + value + "' for app '" + key + "' is not a string.")
+			logs.Err("The version '" + value + "' for app '" + key + "' is not a string.")
 		}
 	}
 
 	versionsFromfile = checkedMap
 }
 
-func updateAppVersion(app app.App, platform string, versionsFilePath string, dryRun bool, skipLocal bool) error {
-	fmt.Println("Checking " + app.Name + " version ...")
+func updateAppVersion(app app.App, appsDirPath, platform string, versionsFilePath string, dryRun bool, skipLocal bool) error {
+	logs.Info("Checking " + app.Name + " version ...")
 	if app.LocalVersion() == "" {
 		return errors.New("Retrieval of local version for app '" + app.Name + "' failed.")
 	}
 
-	latestVersion := app.GetLatestVersion(platform)
+	latestVersion := app.GetLatestVersion(appsDirPath, platform)
 	if latestVersion == "" {
 		return errors.New("Retrieval of latest version for app '" + app.Name + "' failed.")
 	}
 
 	if app.LocalVersion() == latestVersion {
-		fmt.Println("App '" + app.Name + "' is already installed with the latest version (v" + app.LocalVersion() + ").")
+		logs.Info("App '" + app.Name + "' is already installed with the latest version (v" + app.LocalVersion() + ").")
 	} else {
 		if !dryRun {
 			reader := bufio.NewReader(os.Stdin)
-			fmt.Print("Do you want to update from v" + app.LocalVersion() + " to v" + latestVersion + "? [y/n] ")
+			logs.Info("Do you want to update from v" + app.LocalVersion() + " to v" + latestVersion + "? [y/n] ")
 			text, err := reader.ReadString('\n')
 			if err != nil {
 				return err
@@ -70,28 +70,28 @@ func updateAppVersion(app app.App, platform string, versionsFilePath string, dry
 				versionsFromfile[app.Name] = latestVersion
 				bFileContents, err := yaml.Marshal(&versionsFromfile)
 				if err != nil {
-					log.Fatalln("There was an error during the conversion of the updated versionsFile:\n" + err.Error())
+					logs.Err("There was an error during the conversion of the updated versionsFile:", err)
 				}
 				f, err := os.Open(versionsFilePath)
 				if err != nil {
-					log.Fatalln("There was an error while opening the versionsFile at '" + versionsFilePath + "':\n" + err.Error())
+					logs.Err("There was an error while opening the versionsFile at '"+versionsFilePath+"':", err)
 				}
 				defer f.Close()
 				err = f.Truncate(0)
 				if err != nil {
-					log.Fatalln("There was an error while removing earlier contents in the versionsFile at '" + versionsFilePath + "':\n" + err.Error())
+					logs.Err("There was an error while removing earlier contents in the versionsFile at '"+versionsFilePath+"':", err)
 				}
 				_, err = fmt.Fprint(f, bFileContents)
 				if err != nil {
-					log.Fatalln("There was an error while writing to the versionsFile at '" + versionsFilePath + "':\n" + err.Error())
+					logs.Err("There was an error while writing to the versionsFile at '"+versionsFilePath+"':", err)
 				}
 				//TODO: parse version file, update version of app, save yaml back to file
-				fmt.Println("Updated from v" + app.LocalVersion() + " to v" + latestVersion + ".")
+				logs.Info("Updated from v" + app.LocalVersion() + " to v" + latestVersion + ".")
 			} else {
-				fmt.Println("Skipped " + app.Name + ".")
+				logs.Info("Skipped " + app.Name + ".")
 			}
 		} else {
-			fmt.Println("App '" + app.Name + "' could be upgraded from version '" + app.LocalVersion() + "' to version '" + latestVersion + "'.")
+			logs.Info("App '" + app.Name + "' could be upgraded from version '" + app.LocalVersion() + "' to version '" + latestVersion + "'.")
 		}
 	}
 	return nil

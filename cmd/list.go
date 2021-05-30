@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
 	"github.com/thetillhoff/eac/pkg/apps"
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 // listCmd represents the list command
@@ -17,11 +16,11 @@ var listCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		noVersion, err := cmd.Flags().GetBool("no-version")
 		if err != nil {
-			log.Fatalln("There was an error while reading the flag 'no-version':\n" + err.Error())
+			logs.Err("There was an error while reading the flag 'no-version':", err)
 		}
 		seperator, err := cmd.Flags().GetString("seperator")
 		if err != nil {
-			log.Fatalln("There was an error while reading the flag 'seperator':\n" + err.Error())
+			logs.Err("There was an error while reading the flag 'seperator':", err)
 		}
 		apps.List(appsDirPath, versionsFilePath, noVersion, seperator)
 	},

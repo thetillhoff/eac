@@ -1,11 +1,10 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"path"
 
 	"github.com/spf13/cobra"
+	"github.com/thetillhoff/eac/pkg/logs"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -44,7 +43,7 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file locatio, defaults to $HOME/.eac.yaml")
-	rootCmd.PersistentFlags().StringVarP(&shell, "shell", "s", "", "Override shell for all apps, defaults to /bin/sh")
+	rootCmd.PersistentFlags().StringVarP(&shell, "shell", "s", "", "Override shell for all apps, defaults to '/bin/sh -c'")
 	rootCmd.PersistentFlags().StringVarP(&appsDirPath, "appsDirPath", "a", appsDirPath, "Override location of apps, defaults to ./apps/") //TODO: implementation
 	rootCmd.PersistentFlags().BoolVar(&continueOnError, "continue-on-error", false, "Continue with other tasks even on failures, defaults to false")
 
@@ -73,6 +72,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		logs.Info("Using config file:", viper.ConfigFileUsed())
 	}
 }

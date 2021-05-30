@@ -6,51 +6,80 @@ package apps
 var demoFiles = map[string]map[string]string{ //TODO: add proper initial scripts
 	"linux": {
 		"configure.sh": `#/bin/sh
-echo "This script is called to configure of app %v"
+
+echo "This script is called to configure app '%[1]v'."
 `,
 		"getLatestVersion.sh": `#/bin/sh
-echo "This script is called to getLatestVersion of app %v"
+
+# This script has to print (only!) the version of the app to stdout. Trailing newlines are fine though.
+# Example:
+curl --silent "https://api.github.com/repos/thetillhoff/%[1]v/releases/latest" |
+	grep 'tag_name' | # f.e. '  "tag_name": "v1.2.3",'
+	cut -d'"' -f4 | # f.e. 'v1.2.3'
+	cut -c2- # f.e. '1.2.3'
 `,
 		"getLocalVersion.sh": `#/bin/sh
 
 # This script has to print (only!) the version of the app to stdout. Trailing newlines are fine though.
-# Example: '%v version' prints '%v version 1.2.3', then the following line would be sufficient.
-printf "$(%v version | cut -d' ' -f 3)\n"
+# Example:
+printf "$(%[1]v --version | # f.e. '%[1]v version 1.2.3'
+	cut -d' ' -f 3)\n" # f.e. '1.2.3'
 `,
 		"install.sh": `#/bin/sh
-echo "This script is called to install of app %v"
+
+# $1==appName
+# $2==tmpFolder, gets created before this script is called and deleted afterwards
+
+wget -q "https://github.com/thetillhoff/%[1]v/releases/download/v$1/%[1]v-linux-amd64" -O "$2/%[1]v-linux-amd64"
+chmod +x "$2/%[1]v-linux-amd64" 
+sudo mv "$2/%[1]v-linux-amd64" "/usr/local/bin/%[1]v"
 `,
 		"uninstall.sh": `#/bin/sh
-echo "This script is called to uninstall of app %v"
+
+sudo rm /usr/local/bin/%[1]v
 `,
 	},
 	"darwin": {
 		"configure.sh": `#/bin/sh
-echo "This script is called to configure of app %v"
+echo "This script is called to configure of app %[1]v."
 `,
 		"getLatestVersion.sh": `#/bin/sh
-echo "This script is called to getLatestVersion of app %v"
+
+# This script has to print (only!) the version of the app to stdout. Trailing newlines are fine though.
+# Example:
+curl --silent "https://api.github.com/repos/thetillhoff/%[1]v/releases/latest" |
+	grep 'tag_name' | # f.e. '  "tag_name": "v1.2.3",'
+	cut -d'"' -f4 | # f.e. 'v1.2.3'
+	cut -c2- # f.e. '1.2.3'
 `,
 		"getLocalVersion.sh": `#/bin/sh
-echo "This script is called to getLocalVersion of app %v"
+
+# This script has to print (only!) the version of the app to stdout. Trailing newlines are fine though.
+# Example: '%[1]v --version' prints '%[1]v version 1.2.3', then the following line would be sufficient.
+printf "$(%[1]v --version | cut -d' ' -f 3)\n"
 `,
 		"install.sh": `#/bin/sh
-echo "This script is called to install of app %v"
+
+binaryName=$(openssl rand -base64 16)%[1]v
+wget "https://github.com/thetillhoff/%[1]v/releases/download/v$1/%[1]v-linux-amd64" -O $binaryName
+chmod +x $binaryName
+sudo mv $binaryName /usr/local/bin/%[1]v
 `,
 		"uninstall.sh": `#/bin/sh
-echo "This script is called to uninstall of app %v"
+
+sudo rm /usr/local/bin/%[1]v		
 `,
 	},
 	"windows": {
-		"configure.ps1": `Write-Host "This script is called to configure of app %v"
+		"configure.ps1": `Write-Host "This script is called to configure app %[1]v."
 `,
-		"getLatestVersion.ps1": `Write-Host "This script is called to getLatestVersion of app %v"
+		"getLatestVersion.ps1": `Write-Host "This script is called to getLatestVersion of app %[1]v."
 `,
-		"getLocalVersion.ps1": `Write-Host "This script is called to getLocalVersion of app %v"
+		"getLocalVersion.ps1": `Write-Host "This script is called to getLocalVersion of app %[1]v."
 `,
-		"install.ps1": `Write-Host "This script is called to install of app %v"
+		"install.ps1": `Write-Host "This script is called to install app %[1]v."
 `,
-		"uninstall.ps1": `Write-Host "This script is called to uninstall of app %v"
+		"uninstall.ps1": `Write-Host "This script is called to uninstall app %[1]v."
 `,
 	},
 }

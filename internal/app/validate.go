@@ -36,7 +36,7 @@ func (app App) Validate(appsDirPath string, platform string) (string, error) {
 		return "", errors.New(err)
 	}
 
-	localVersion := app.getLocalVersion(platform) // should the app not be installed locally, the this will return an empty string
+	localVersion := app.getLocalVersion(appsDirPath, platform) // should the app not be installed locally, the this will return an empty string
 	if strings.Contains(localVersion, "\n") {
 		err := "The local version for app '" + app.Name + "' can't be retrieved. The result should be one line, but is:\n"
 		err = err + localVersion
@@ -44,7 +44,7 @@ func (app App) Validate(appsDirPath string, platform string) (string, error) {
 	} else {
 		out = out + "The local version for app '" + app.Name + "' could be retrieved.\n"
 	}
-	latestVersion := app.GetLatestVersion(platform)
+	latestVersion := app.GetLatestVersion(appsDirPath, platform)
 	if strings.Contains(latestVersion, "\n") {
 		err := "The latest version for app '" + app.Name + "' can't be retrieved. The result should be one line, but is:\n"
 		err = err + latestVersion

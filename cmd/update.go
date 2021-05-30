@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
 	"github.com/thetillhoff/eac/pkg/apps"
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 // updateCmd represents the update command
@@ -17,11 +16,11 @@ var updateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		dryRun, err := cmd.Flags().GetBool("dry-run")
 		if err != nil {
-			log.Fatalln("There was an error while reading the flag 'dry-run':\n" + err.Error())
+			logs.Err("There was an error while reading the flag 'dry-run':\n", err)
 		}
 		skipLocal, err := cmd.Flags().GetBool("skip-local")
 		if err != nil {
-			log.Fatalln("There was an error while reading the flag 'skip-local':\n" + err.Error())
+			logs.Err("There was an error while reading the flag 'skip-local':\n", err)
 		}
 		apps.Update(args, shell, appsDirPath, continueOnError, versionsFilePath, dryRun, skipLocal)
 	},

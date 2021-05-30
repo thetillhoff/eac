@@ -1,8 +1,7 @@
 package apps
 
 import (
-	"fmt"
-	"log"
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 func Validate(appNames []string, flaggedPlatforms []string, shell string, appsDirPath string, continueOnError bool) {
@@ -14,9 +13,9 @@ func Validate(appNames []string, flaggedPlatforms []string, shell string, appsDi
 	for _, appItem := range apps {
 		for _, platform := range platforms {
 			out, err := appItem.Validate(appsDirPath, platform)
-			fmt.Println(out)
+			logs.Info("Output of configuration script:", out)
 			if err != nil {
-				log.Fatal(err)
+				logs.Err("There was an error while validating app '"+appItem.Name+"':", err)
 			}
 		}
 	}
