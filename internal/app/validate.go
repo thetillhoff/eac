@@ -10,6 +10,11 @@ func (app App) Validate(appsDirPath string, platform string) (string, error) {
 	out := ""
 
 	shellpath := []string{app.shell}
+	if strings.Contains(app.shell, " ") { // if shell contains spaces (and therefore arguments)
+		// don't edit the app.shell directly, as it is later used to retrieve the local and latest version. Instead edit the copy in shellpath.
+		shellpath = []string{strings.Split(app.shell, " ")[0]} // remove those arguments (before checking for file existance)
+	}
+
 	if len(testFiles(shellpath...)) == 0 {
 		out = out + "The shell for '" + app.Name + "' exists.\n"
 	} else {
@@ -36,7 +41,7 @@ func (app App) Validate(appsDirPath string, platform string) (string, error) {
 		return "", errors.New(err)
 	}
 
-	localVersion := app.getLocalVersion(appsDirPath, platform) // should the app not be installed locally, the this will return an empty string
+	localVersion := app.LocalVersion(appsDirPath) // should the app not be installed locally, the this will return an empty string
 	if strings.Contains(localVersion, "\n") {
 		err := "The local version for app '" + app.Name + "' can't be retrieved. The result should be one line, but is:\n"
 		err = err + localVersion

@@ -32,7 +32,7 @@ func ResolvePlatforms(flaggedPlatforms []string) []string {
 		}
 		if flaggedPlatform == "all" {
 			if len(platforms) > 0 {
-				logs.Warn("You set platfroms to all, ignoring other specified platforms.")
+				logs.Warn("You set platforms to all, ignoring other specified platforms.")
 			}
 			platforms = ValidPlatforms()
 			continue

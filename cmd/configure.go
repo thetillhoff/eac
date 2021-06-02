@@ -13,7 +13,7 @@ var configureCmd = &cobra.Command{
 	eac configure app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		apps.Configure(args, shell, appsDirPath, continueOnError)
+		apps.Configure(args, shell, appsDirPath, continueOnError, verbose, true) // checkLocalVersion by default
 	},
 }
 

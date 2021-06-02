@@ -11,6 +11,7 @@ type App struct {
 	shell                  string // set specific shell to use for the scripts of this app
 	wantedVersion          string // version of this app, which is desired to be installed
 	localVersion           string // version of this app, which is currently installed
+	localVersionFailed     bool   // if true, the getLocalVersion script failed
 }
 
 type AppOption func(*App)
@@ -85,6 +86,7 @@ func New(appName string, options ...AppOption) *App {
 		uninstallScript:        "uninstall.sh",
 		continueOnError:        false,
 		wantedVersion:          "",
+		localVersionFailed:     false,
 	}
 
 	for _, opt := range options { // set custom properties

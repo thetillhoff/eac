@@ -1,28 +1,19 @@
 package app
 
 import (
-	"os"
 	"os/exec"
 	"path"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func RunScript(shell string, appName string, appsDirPath string, platform string, script string, appcontinueOnError bool, args ...string) (string, error) {
+func RunScript(shell string, appName string, appsDirPath string, platform string, script string, appContinueOnError bool, args ...string) (string, error) {
 	var (
 		cmd *exec.Cmd
 	)
 
-	tmpFolder := path.Join(os.TempDir(), strconv.FormatInt(time.Now().UnixNano(), 10))
-
-	err := os.Mkdir(tmpFolder, os.ModePerm)
-	if err != nil {
-		logs.Err("Failed to create temporary folder:", err)
-	}
-	logs.Info("Created temporary folder at " + tmpFolder)
+	tmpFolder := createTmpFolder(appContinueOnError)
 
 	scriptWithArgs := []string{}
 	scriptWithArgs = append(scriptWithArgs, path.Join(appsDirPath, appName, platform, script)) // f.e. 'apps/eac/linux/install.sh'
@@ -40,14 +31,11 @@ func RunScript(shell string, appName string, appsDirPath string, platform string
 	outBytes, err := cmd.CombinedOutput()
 	out := strings.TrimSuffix(string(outBytes), "\n")
 	if err != nil {
-		logs.Err("Failed to run script '"+script+"':", out, err)
+		deleteTmpFolder(tmpFolder, true)
+		logs.Err("Failed to run script '"+script+"':", appContinueOnError, out, err)
 	}
 
-	err = os.RemoveAll(tmpFolder)
-	if err != nil {
-		logs.Err("Failed to delete temporary folder:", err)
-	}
-	logs.Info("Deleted temporary folder at " + tmpFolder)
+	deleteTmpFolder(tmpFolder, appContinueOnError)
 
 	return out, err
 }

@@ -17,18 +17,18 @@ var installCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		noConfigure, err := cmd.Flags().GetBool("no-configure")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'no-configure':", err)
+			logs.Err("There was an error while reading the flag 'no-configure':", continueOnError, err)
 		}
 		update, err := cmd.Flags().GetBool("update")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'update':", err)
+			logs.Err("There was an error while reading the flag 'update':", continueOnError, err)
 		}
 		latest, err := cmd.Flags().GetBool("latest")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'latest':", err)
+			logs.Err("There was an error while reading the flag 'latest':", continueOnError, err)
 		}
 
-		apps.Install(args, noConfigure, update, shell, appsDirPath, continueOnError, versionsFilePath, latest) // Install apps
+		apps.Install(args, noConfigure, update, shell, appsDirPath, continueOnError, versionsFilePath, latest, verbose) // Install apps
 	},
 }
 

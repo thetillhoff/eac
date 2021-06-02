@@ -18,10 +18,10 @@ var deleteCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'platform':", err)
+			logs.Err("There was an error while reading the flag 'platform':", continueOnError, err)
 		}
 
-		apps.Delete(args, flaggedPlatforms, shell, appsDirPath, continueOnError)
+		apps.Delete(args, flaggedPlatforms, shell, appsDirPath, continueOnError, verbose)
 	},
 }
 

@@ -12,13 +12,22 @@ var (
 	info   = color.New(color.FgGreen)
 	warn   = color.New(color.FgYellow)
 	err    = color.New(color.FgRed)
+
+	Verbose = false
 )
 
-func Info(message string, objs ...interface{}) {
-	info.Fprint(os.Stdout, "INF ")
+func Success(message string) {
+	info.Fprint(os.Stdout, "SUC ")
 	normal.Fprintln(os.Stdout, message)
-	if len(objs) > 0 {
-		normal.Fprintln(os.Stdout, objs)
+}
+
+func Info(message string, objs ...interface{}) {
+	if Verbose {
+		info.Fprint(os.Stdout, "INF ")
+		normal.Fprintln(os.Stdout, message)
+		if len(objs) > 0 {
+			normal.Fprintln(os.Stdout, objs)
+		}
 	}
 }
 func Warn(message string, objs ...interface{}) {
@@ -28,11 +37,19 @@ func Warn(message string, objs ...interface{}) {
 		normal.Fprintln(os.Stdout, objs)
 	}
 }
-func Err(message string, objs ...interface{}) {
+func Err(message string, continueOnError bool, objs ...interface{}) {
 	err.Fprint(os.Stderr, "ERR ")
 	normal.Fprintln(os.Stderr, message)
 	if len(objs) > 0 {
-		normal.Fprintln(os.Stderr, objs)
+		for _, obj := range objs {
+			if errObj, ok := obj.(error); ok && !continueOnError {
+				panic(errObj)
+			} else {
+				normal.Fprintln(os.Stderr, obj)
+			}
+		}
 	}
-	os.Exit(1)
+	if !continueOnError {
+		os.Exit(1)
+	}
 }

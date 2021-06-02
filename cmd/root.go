@@ -14,6 +14,7 @@ var (
 	cfgFile          string
 	shell            string
 	continueOnError  bool
+	verbose          bool
 	appsDirPath      = path.Clean("apps") //TODO make this an absolute path, so eac can be added to $PATH (don't forget to edit helptext for it) // -> do this, when deciding where to put eac on linux systems, windows systems and their corresponding apps-dir
 	versionsFilePath = path.Clean("versions.yaml")
 )
@@ -42,10 +43,11 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file locatio, defaults to $HOME/.eac.yaml")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file location, defaults to $HOME/.eac.yaml")
 	rootCmd.PersistentFlags().StringVarP(&shell, "shell", "s", "", "Override shell for all apps, defaults to '/bin/sh -c'")
-	rootCmd.PersistentFlags().StringVarP(&appsDirPath, "appsDirPath", "a", appsDirPath, "Override location of apps, defaults to ./apps/") //TODO: implementation
+	rootCmd.PersistentFlags().StringVarP(&appsDirPath, "appsDirPath", "a", appsDirPath, "Override location of apps, defaults to ./apps/")
 	rootCmd.PersistentFlags().BoolVar(&continueOnError, "continue-on-error", false, "Continue with other tasks even on failures, defaults to false")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Display more information during command execution, defaults to false")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

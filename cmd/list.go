@@ -16,13 +16,13 @@ var listCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		noVersion, err := cmd.Flags().GetBool("no-version")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'no-version':", err)
+			logs.Err("There was an error while reading the flag 'no-version':", continueOnError, err)
 		}
 		seperator, err := cmd.Flags().GetString("seperator")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'seperator':", err)
+			logs.Err("There was an error while reading the flag 'seperator':", continueOnError, err)
 		}
-		apps.List(appsDirPath, versionsFilePath, noVersion, seperator)
+		apps.List(appsDirPath, versionsFilePath, noVersion, seperator, verbose)
 	},
 }
 

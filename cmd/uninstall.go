@@ -13,7 +13,7 @@ var uninstallCmd = &cobra.Command{
 	eac update app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		apps.Uninstall(args, shell, appsDirPath, continueOnError) // Uninstall apps
+		apps.Uninstall(args, shell, appsDirPath, continueOnError, verbose) // Uninstall apps
 	},
 }
 
