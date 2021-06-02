@@ -40,13 +40,20 @@ I wanted a short name and it should be unique, too. The meaning of "iac" is basi
 
 > "My" in the following context means the owner(s)/author(s)/member(s) of this tool. Currently this is only me and I think its easier to write from my point of view anyway.
 
+- Write down each possible command with description what is does and what it does not.
+- Create helpers/scripts/sources folder, where for each type of generic tool scripts can be placed. F.e. github binary release, github tar.gz release, github zip release, apt
+- `eac update <app>` should not fail if app is not installed. Instead get the latest version and store it to the versions.yaml
+  Make it possible to upgrade currently not installed apps, without trying to get a local version to compare to. -> compare only against versionsFile
 - Create/add some example apps
-- add `install --self` and `uninstall --self` commands for eac self-management
-- Make it possible to upgrade currently not installed apps, without trying to get a local version to compare to. -> compare only against versionsFile
-- Make it possible to install apps without adding their version to the versionsFile - and with it. (Currently the versionsFile is never edited.)
+- Add `install --self` and `uninstall --self` commands for eac self-management. (not updating, just plain install & ununstall)
+- check folder `apps` into git, and store all "configured" apps there. Later on, they might be downloaded from there as well.
+- Add Dockercontainer to registry for eac usage.
+- Make it possible to install apps without adding their version to the versionsFile - and with it. (Currently the versionsFile is never edited.) -> --latest
 - Resolve `//TODO`s. There are quite a lot.
-- Should it be 'appsDirPath/platform/appName' or 'appsDirPath/appName/platform'? Currently it is the latter.
-- Write Tests.
+- add bash/zsh autocompletion
+- `install --tmpFolder` parameter for specifying specific folder. Add checking for already existing files there.
+- Should it be 'appsDirPath/platform/appName' or 'appsDirPath/appName/platform'? Currently it is the latter. // -> might be better, as like this the apps are selfcontained
+- Write (unit) tests.
 - Check & test how eac behaves with settings files.
 - Create github actions for tests, release
 - Create initial release (f.e. 0.0.1).
@@ -71,3 +78,7 @@ I wanted a short name and it should be unique, too. The meaning of "iac" is basi
     - How to handle updates?
     - How does everyone know how to handle settings? Wouldn't this require an additional command `snapshot-settings` or something like that?
   - Summary: This is a large step and will require quite some time and even more thoughts. For now, I'll leave it as is. This means without any `download` or `upload` commands and without a single source of truth for installing apps. I'll leave it here though, so my future self will know where to continue.
+
+## The bugs
+- `~` can't be resolved in the scripts. Use `$HOME` instead.
+- The default script (at least on wsl, untested on others) for script executions is `dash`. So it seems the `shell` param doesn't work properly...
