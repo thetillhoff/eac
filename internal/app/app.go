@@ -16,7 +16,6 @@ func (app App) LocalVersion(appsDirPath string) string {
 	)
 	if app.localVersion == "" {
 		localVersion, err = RunScript(app.shell, app.Name, appsDirPath, runtime.GOOS, app.getLocalVersionScript)
-		logs.Info("test2: ", app.Name, localVersion, err)
 		if err != nil {
 			logs.Warn("App '"+app.Name+"' is not installed or the getLocalVersion script doesn't work properly.", localVersion, err)
 			localVersion = ""

@@ -44,7 +44,7 @@ func Err(message string, objs ...interface{}) {
 	if len(objs) > 0 {
 		for _, obj := range objs {
 			if errObj, ok := obj.(error); ok && !ContinueOnError {
-				panic(errObj)
+				normal.Fprintln(os.Stderr, errObj)
 			} else {
 				normal.Fprintln(os.Stderr, obj)
 			}
