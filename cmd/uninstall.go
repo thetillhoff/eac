@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/thetillhoff/eac/pkg/apps"
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 // uninstallCmd represents the uninstall command
@@ -13,7 +14,8 @@ var uninstallCmd = &cobra.Command{
 	eac update app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		apps.Uninstall(args, shell, appsDirPath, continueOnError, verbose) // Uninstall apps
+		logs.ContinueOnError = continueOnError
+		apps.Uninstall(args, shell, appsDirPath, verbose, versionsFilePath) // Uninstall apps
 	},
 }
 

@@ -6,9 +6,9 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Uninstall(appNames []string, shell string, appsDirPath string, continueOnError bool, verbose bool) {
+func Uninstall(appNames []string, shell string, appsDirPath string, verbose bool, versionsFilePath string) {
 	logs.Verbose = verbose
-	apps := apps(appNames, shell, continueOnError)
+	apps := apps(appNames, shell, versionsFilePath)
 
 	for _, appItem := range apps {
 		out, err := appItem.Uninstall(appsDirPath, runtime.GOOS)
@@ -17,7 +17,7 @@ func Uninstall(appNames []string, shell string, appsDirPath string, continueOnEr
 		}
 		logs.Info("Output of uninstallation script:", out)
 		if err != nil {
-			logs.Err("There was an error during uninstallation of app '"+appItem.Name+"':", continueOnError, err)
+			logs.Err("There was an error during uninstallation of app '"+appItem.Name+"':", err)
 		}
 	}
 }

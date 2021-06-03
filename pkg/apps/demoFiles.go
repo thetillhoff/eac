@@ -23,7 +23,7 @@ curl --silent "https://api.github.com/repos/%[1]v/%[1]v/releases/latest" |
 # This script has to print (only!) the version of the app to stdout. Trailing newlines are fine though.
 # Example:
 %[1]v --version | # f.e. '%[1]v version 1.2.3'
-	cut -d' ' -f 3) # f.e. '1.2.3'
+	cut -d' ' -f 3 # f.e. '1.2.3'
 `,
 		"install.sh": `#/bin/sh
 

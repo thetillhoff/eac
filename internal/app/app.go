@@ -3,59 +3,76 @@ package app
 import (
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func (app App) WantedVersion() string {
-	return app.wantedVersion
-}
-
+// This will either return the local version or an empty string (when the script for getting the local version failed, f.e. if the app is not installed)
 func (app App) LocalVersion(appsDirPath string) string {
-	if app.localVersion == "" && !app.localVersionFailed {
-		app.localVersion = app.getLocalVersion(appsDirPath)
+	var (
+		localVersion string
+		err          error
+	)
+	if app.localVersion == "" {
+		localVersion, err = RunScript(app.shell, app.Name, appsDirPath, runtime.GOOS, app.getLocalVersionScript)
+		logs.Info("test2: ", app.Name, localVersion, err)
+		if err != nil {
+			logs.Warn("App '"+app.Name+"' is not installed or the getLocalVersion script doesn't work properly.", localVersion, err)
+			localVersion = ""
+		}
+		if strings.Contains(localVersion, app.Name+": not found") {
+			logs.Warn("App '" + app.Name + "' is not installed.")
+			localVersion = ""
+		}
+		app.localVersion = localVersion
+		logs.Info("Updated localVersion for app '" + app.Name + "'.")
 	}
 	return app.localVersion
 }
 
-// This will either return the local version or an empty string (when the script for getting the local version failed, f.e. if the app is not installed)
-func (app App) getLocalVersion(appsDirPath string) string {
-	localVersion, err := RunScript(app.shell, app.Name, appsDirPath, runtime.GOOS, app.getLocalVersionScript, app.continueOnError)
-	if err != nil {
-		logs.Warn("App '" + app.Name + "' is not installed or the getLocalVersion script doesn't work properly.")
-		localVersion = ""
+func (app App) LatestVersion(appsDirPath string, platform string) string {
+	var (
+		latestVersion string
+		err           error
+	)
+	if app.latestVersion == "" {
+		latestVersion, err = RunScript(app.shell, app.Name, appsDirPath, platform, app.getLatestVersionScript)
+		if err != nil {
+			logs.Err("There was an error while retrieving the latest version of app '"+app.Name+"':", err)
+			latestVersion = ""
+		}
+		if latestVersion == "" {
+			logs.Err("There was an error while retrieving the latest version of app '"+app.Name+"'.", latestVersion)
+		} else if strings.Contains(latestVersion, "\n") {
+			logs.Err("The latestVersion of app '"+app.Name+"' was not a single line:", latestVersion)
+		}
+		app.latestVersion = latestVersion
+		logs.Info("Updated latestVersion for app '" + app.Name + "'.")
 	}
-	return localVersion
-}
-
-func (app App) GetLatestVersion(appsDirPath string, platform string) string {
-	latestVersion, err := RunScript(app.shell, app.Name, appsDirPath, platform, app.getLatestVersionScript, app.continueOnError)
-	if err != nil {
-		logs.Err("There was an error while retrieving the latest version of app '"+app.Name+"':", app.continueOnError, err)
-	}
-	return latestVersion
+	return app.latestVersion
 }
 
 func (app App) Install(appsDirPath string, platform string, version string) (App, string, error) {
-	if version == "" && app.WantedVersion() == "" {
-		latestVersion := app.GetLatestVersion(appsDirPath, platform)
+	if version == "" && app.WantedVersion == "" {
+		latestVersion := app.LatestVersion(appsDirPath, platform)
 		if latestVersion == "" {
-			logs.Err("There was an error while retrieving the latest version of app '"+app.Name+"'.", app.continueOnError)
+			logs.Err("There was an error while retrieving the latest version of app '" + app.Name + "'.")
 		}
-		app.wantedVersion = latestVersion
+		app.WantedVersion = latestVersion
 	}
 
-	out, err := RunScript(app.shell, app.Name, appsDirPath, platform, app.installScript, app.continueOnError, app.WantedVersion())
+	out, err := RunScript(app.shell, app.Name, appsDirPath, platform, app.installScript, app.WantedVersion)
 
 	return app, out, err
 }
 
 func (app App) Configure(appsDirPath string, platform string) (string, error) {
-	return RunScript(app.shell, app.Name, appsDirPath, platform, app.configureScript, app.continueOnError)
+	return RunScript(app.shell, app.Name, appsDirPath, platform, app.configureScript)
 }
 
 func (app App) Uninstall(appsDirPath string, platform string) (string, error) {
-	return RunScript(app.shell, app.Name, appsDirPath, platform, app.uninstallScript, app.continueOnError)
+	return RunScript(app.shell, app.Name, appsDirPath, platform, app.uninstallScript)
 }
 
 func testFiles(filepaths ...string) []string {

@@ -7,11 +7,10 @@ type App struct {
 	configureScript        string // script that configures the app (if installed)
 	getLatestVersionScript string // script that checks for new versions of the app
 	uninstallScript        string // script that uninstalls the app
-	continueOnError        bool   // if true, only this app will be skipped
 	shell                  string // set specific shell to use for the scripts of this app
-	wantedVersion          string // version of this app, which is desired to be installed
+	WantedVersion          string // version of this app, which is desired to be installed
 	localVersion           string // version of this app, which is currently installed
-	localVersionFailed     bool   // if true, the getLocalVersion script failed
+	latestVersion          string // latest available version of this app
 }
 
 type AppOption func(*App)
@@ -58,17 +57,10 @@ func ConfigureScript(s string) AppOption {
 		}
 	}
 }
-func ContinueOnError(b bool) AppOption {
-	return func(a *App) {
-		if b {
-			a.continueOnError = b
-		}
-	}
-}
 func WantedVersion(s string) AppOption {
 	return func(a *App) {
 		if s != "" {
-			a.wantedVersion = s
+			a.WantedVersion = s
 		}
 	}
 }
@@ -84,9 +76,9 @@ func New(appName string, options ...AppOption) *App {
 		configureScript:        "configure.sh",
 		getLatestVersionScript: "getLatestVersion.sh",
 		uninstallScript:        "uninstall.sh",
-		continueOnError:        false,
-		wantedVersion:          "",
-		localVersionFailed:     false,
+		WantedVersion:          "",
+		localVersion:           "",
+		latestVersion:          "",
 	}
 
 	for _, opt := range options { // set custom properties
@@ -94,4 +86,18 @@ func New(appName string, options ...AppOption) *App {
 	}
 
 	return appItem
+}
+
+func (app App) String() string {
+	appString := ""
+	appString = appString + "Name: " + app.Name + "\n"
+	appString = appString + "Shell: " + app.shell + "\n"
+	appString = appString + "WantedVersion: " + app.WantedVersion + "\n"
+	appString = appString + "LocalVersion: " + app.localVersion + "\n"
+	appString = appString + "LatestVersion: " + app.latestVersion + "\n"
+	appString = appString + "LocalVersionScript: " + app.getLocalVersionScript + "\n"
+	appString = appString + "LatestVersionScript: " + app.getLatestVersionScript + "\n"
+	appString = appString + "UninstallScript: " + app.uninstallScript + "\n"
+
+	return appString
 }

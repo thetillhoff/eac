@@ -4,9 +4,9 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Validate(appNames []string, flaggedPlatforms []string, shell string, appsDirPath string, continueOnError bool, verbose bool) {
+func Validate(appNames []string, flaggedPlatforms []string, shell string, appsDirPath string, verbose bool, versionsFilePath string) {
 	logs.Verbose = verbose
-	apps := apps(appNames, shell, continueOnError)
+	apps := apps(appNames, shell, versionsFilePath)
 
 	platforms := ResolvePlatforms(flaggedPlatforms)
 
@@ -15,7 +15,7 @@ func Validate(appNames []string, flaggedPlatforms []string, shell string, appsDi
 			out, err := appItem.Validate(appsDirPath, platform)
 			logs.Info("Output of validation:", out)
 			if err != nil {
-				logs.Err("There was an error while validating app '"+appItem.Name+"':", continueOnError, err)
+				logs.Err("There was an error while validating app '"+appItem.Name+"':", err)
 			} else {
 				logs.Success("Validation of app '" + appItem.Name + "' successful.")
 			}

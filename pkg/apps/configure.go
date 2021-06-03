@@ -6,15 +6,15 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Configure(appNames []string, shell string, appsDirPath string, continueOnError bool, verbose bool, checkLocalVersion bool) {
+func Configure(appNames []string, shell string, appsDirPath string, verbose bool, checkLocalVersion bool, versionsFilePath string) {
 	logs.Verbose = verbose
-	apps := apps(appNames, shell, continueOnError)
+	apps := apps(appNames, shell, versionsFilePath)
 
 	for _, appItem := range apps {
 		if checkLocalVersion {
 			localVersion := appItem.LocalVersion(appsDirPath) // test if get-local-version works (to check if app is already installed), if not, fail (with custom error)
 			if localVersion == "" {
-				logs.Err("There was an error during configuration of app '"+appItem.Name+"':\nIt was not possible to retrieve the local version.\nAre you sure the scripts are up-to-date?", continueOnError)
+				logs.Err("There was an error during configuration of app '"+appItem.Name+"':", "It was not possible to retrieve the local version.\nAre you sure the scripts are up-to-date?")
 			}
 		}
 
@@ -26,7 +26,7 @@ func Configure(appNames []string, shell string, appsDirPath string, continueOnEr
 			logs.Info("Output of configuration script:", out)
 		}
 		if err != nil {
-			logs.Err("There was an error during configuration of app '"+appItem.Name+"':", continueOnError, err)
+			logs.Err("There was an error during configuration of app '"+appItem.Name+"':", err)
 		}
 	}
 }

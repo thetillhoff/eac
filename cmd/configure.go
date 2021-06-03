@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/thetillhoff/eac/pkg/apps"
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 // configureCmd represents the configure command
@@ -13,7 +14,8 @@ var configureCmd = &cobra.Command{
 	eac configure app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		apps.Configure(args, shell, appsDirPath, continueOnError, verbose, true) // checkLocalVersion by default
+		logs.ContinueOnError = continueOnError
+		apps.Configure(args, shell, appsDirPath, verbose, true, versionsFilePath) // checkLocalVersion by default
 	},
 }
 

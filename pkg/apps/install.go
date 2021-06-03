@@ -6,9 +6,9 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Install(appNames []string, noConfigure bool, update bool, shell string, appsDirPath string, continueOnError bool, versionsFilePath string, latest bool, verbose bool) {
+func Install(appNames []string, noConfigure bool, update bool, shell string, appsDirPath string, versionsFilePath string, latest bool, verbose bool) {
 	logs.Verbose = verbose
-	apps := apps(appNames, shell, continueOnError)
+	apps := apps(appNames, shell, versionsFilePath)
 
 	// if not latest
 	//   if not update
@@ -22,31 +22,38 @@ func Install(appNames []string, noConfigure bool, update bool, shell string, app
 	//     pass version either from versionsFile or from app.wantedVersion (latter has prio) // if app.wantedVersion is set, and latest flag is set, warn about ignoring "latest" arg (this allows to install some apps with version and some with latest in the same command)
 
 	if !latest { // if specific version should be installed (or version was never specified)
-		loadVersions(versionsFilePath, continueOnError)
 		if update {
 			for _, appItem := range apps {
-				err := updateAppVersion(appItem, appsDirPath, runtime.GOOS, continueOnError, versionsFilePath, false, true) // Update app version, don't care about currently installed version
-				if err != nil {
-					logs.Err("There was an error while updating the version for app '"+appItem.Name+"':", continueOnError, err)
-				}
+				appItem = updateAppVersion(appItem, appsDirPath, runtime.GOOS, versionsFilePath) // Update app version, don't care about currently installed version
 			}
 		}
 	}
 
 	for _, appItem := range apps {
-		if appItem.LocalVersion(appsDirPath) != "" && appItem.LocalVersion(appsDirPath) == appItem.WantedVersion() {
-			logs.Info("App '" + appItem.Name + "' is already installed in wanted version '" + appItem.WantedVersion() + "'.")
+		if latest {
+			appItem.WantedVersion = appItem.LatestVersion(appsDirPath, runtime.GOOS)
+			versionsFromFile[appItem.Name] = appItem.WantedVersion
+			saveVersions(versionsFilePath)
+			logs.Info("Due to flag 'latest', the wantedVersion of app '" + appItem.Name + "' was set to 'v" + appItem.WantedVersion + "'.")
+		} else if appItem.WantedVersion == "" {
+			appItem.WantedVersion = appItem.LatestVersion(appsDirPath, runtime.GOOS)
+			versionsFromFile[appItem.Name] = appItem.WantedVersion
+			saveVersions(versionsFilePath)
+			logs.Info("Version for app '" + appItem.Name + "' was automatically set to latest 'v" + appItem.WantedVersion + "'.")
+		}
+		if appItem.LocalVersion(appsDirPath) == appItem.WantedVersion {
+			logs.Success("App '" + appItem.Name + "' is already installed in wanted version '" + appItem.WantedVersion + "'.")
 		} else { // app is either not installed, or installed in wrong version
 			appItem, out, err := appItem.Install(appsDirPath, runtime.GOOS, "") // Install app
 
 			if err == nil {
-				logs.Success("Installed app '" + appItem.Name + "' in version '" + appItem.WantedVersion() + "'.")
+				logs.Success("Installed app '" + appItem.Name + "' in version '" + appItem.WantedVersion + "'.")
 			}
 			if out != "" {
 				logs.Info("Output of installation script:", out)
 			}
 			if err != nil {
-				logs.Err("There was an error while installing the app '"+appItem.Name+"':", continueOnError, err)
+				logs.Err("There was an error while installing the app '"+appItem.Name+"':", err)
 			}
 
 			if !noConfigure {
@@ -58,7 +65,7 @@ func Install(appNames []string, noConfigure bool, update bool, shell string, app
 					logs.Info("Output of configuration script:", out)
 				}
 				if err != nil {
-					logs.Err("There was an error during configuration of app '"+appItem.Name+"':", continueOnError, err)
+					logs.Err("There was an error during configuration of app '"+appItem.Name+"':", err)
 				}
 			}
 		}

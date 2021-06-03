@@ -8,12 +8,12 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func RunScript(shell string, appName string, appsDirPath string, platform string, script string, appContinueOnError bool, args ...string) (string, error) {
+func RunScript(shell string, appName string, appsDirPath string, platform string, script string, args ...string) (string, error) {
 	var (
 		cmd *exec.Cmd
 	)
 
-	tmpFolder := createTmpFolder(appContinueOnError)
+	tmpFolder := createTmpFolder()
 
 	scriptWithArgs := []string{}
 	scriptWithArgs = append(scriptWithArgs, path.Join(appsDirPath, appName, platform, script)) // f.e. 'apps/eac/linux/install.sh'
@@ -31,11 +31,11 @@ func RunScript(shell string, appName string, appsDirPath string, platform string
 	outBytes, err := cmd.CombinedOutput()
 	out := strings.TrimSuffix(string(outBytes), "\n")
 	if err != nil {
-		deleteTmpFolder(tmpFolder, true)
-		logs.Err("Failed to run script '"+script+"':", appContinueOnError, out, err)
+		deleteTmpFolder(tmpFolder)
+		logs.Err("Failed to run script '"+script+"':", out, err)
 	}
 
-	deleteTmpFolder(tmpFolder, appContinueOnError)
+	deleteTmpFolder(tmpFolder)
 
 	return out, err
 }

@@ -1,3 +1,3 @@
 #/bin/sh
 
-sudo rm "/usr/local/bin/eac"
+sudo rm /usr/local/bin/eac

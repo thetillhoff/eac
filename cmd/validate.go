@@ -16,12 +16,13 @@ var validateCmd = &cobra.Command{
 	eac validate app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		logs.ContinueOnError = continueOnError
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'platform':", continueOnError, err)
+			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
-		apps.Validate(args, flaggedPlatforms, shell, appsDirPath, continueOnError, verbose)
+		apps.Validate(args, flaggedPlatforms, shell, appsDirPath, verbose, versionsFilePath)
 	},
 }
 

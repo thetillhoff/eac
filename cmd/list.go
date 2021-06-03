@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
@@ -14,14 +16,16 @@ var listCmd = &cobra.Command{
 	eac list`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		logs.ContinueOnError = continueOnError
 		noVersion, err := cmd.Flags().GetBool("no-version")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'no-version':", continueOnError, err)
+			logs.Err("There was an error while reading the flag 'no-version':", err)
 		}
 		seperator, err := cmd.Flags().GetString("seperator")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'seperator':", continueOnError, err)
+			logs.Err("There was an error while reading the flag 'seperator':", err)
 		}
+		fmt.Println("Format: <app>[==<installedVersion>]")
 		apps.List(appsDirPath, versionsFilePath, noVersion, seperator, verbose)
 	},
 }

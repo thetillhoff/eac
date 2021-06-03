@@ -14,15 +14,16 @@ var updateCmd = &cobra.Command{
 	eac update app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		logs.ContinueOnError = continueOnError
 		dryRun, err := cmd.Flags().GetBool("dry-run")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'dry-run':", continueOnError, err)
+			logs.Err("There was an error while reading the flag 'dry-run':", err)
 		}
 		skipLocal, err := cmd.Flags().GetBool("skip-local")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'skip-local':", continueOnError, err)
+			logs.Err("There was an error while reading the flag 'skip-local':", err)
 		}
-		apps.Update(args, shell, appsDirPath, continueOnError, versionsFilePath, dryRun, skipLocal, verbose)
+		apps.Update(args, shell, appsDirPath, versionsFilePath, dryRun, skipLocal, verbose)
 	},
 }
 

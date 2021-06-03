@@ -28,6 +28,8 @@ eac's goal is to
 - make the same apps available on all (or at least the most important) platforms in the same way,
 - enable me to use shell commands (or even better: shell-scripts) for each installation, configuration, uninstallation, ... - I mean the installation-instructions are already given by the app developers, why would you require users to migrate those commands to another format (and then probably format them back to the initial commands)?
 
+Out of scope:
+- dependency management of any kind
 
 ## The name
 
@@ -40,11 +42,13 @@ I wanted a short name and it should be unique, too. The meaning of "iac" is basi
 
 > "My" in the following context means the owner(s)/author(s)/member(s) of this tool. Currently this is only me and I think its easier to write from my point of view anyway.
 
+- Add helper-scripts for common installation options, f.e. "common/apt-install.sh <package-name> <repo-url> <repo-key-url>", "common/github-getLatestVersion.sh <repo-owner> <repo-name>". The same could be done for getLatestVersion. This could alternatively  (or additionally) be added as param for create like `eac create <app> --github` or `eac create <app> --apt`.
+  Create helpers/scripts/sources folder, where for each type of generic tool scripts can be placed. F.e. github binary release, github tar.gz release, github zip release, apt
 - Write down each possible command with description what is does and what it does not.
-- Create helpers/scripts/sources folder, where for each type of generic tool scripts can be placed. F.e. github binary release, github tar.gz release, github zip release, apt
 - `eac update <app>` should not fail if app is not installed. Instead get the latest version and store it to the versions.yaml
   Make it possible to upgrade currently not installed apps, without trying to get a local version to compare to. -> compare only against versionsFile
 - Create/add some example apps
+- support minor & major releases - if both is possible, ask the user '(and add potentially a param for that)
 - Add `install --self` and `uninstall --self` commands for eac self-management. (not updating, just plain install & ununstall)
 - check folder `apps` into git, and store all "configured" apps there. Later on, they might be downloaded from there as well.
 - Add Dockercontainer to registry for eac usage.

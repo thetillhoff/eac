@@ -13,7 +13,8 @@ var (
 	warn   = color.New(color.FgYellow)
 	err    = color.New(color.FgRed)
 
-	Verbose = false
+	ContinueOnError = false
+	Verbose         = false
 )
 
 func Success(message string) {
@@ -37,19 +38,19 @@ func Warn(message string, objs ...interface{}) {
 		normal.Fprintln(os.Stdout, objs)
 	}
 }
-func Err(message string, continueOnError bool, objs ...interface{}) {
+func Err(message string, objs ...interface{}) {
 	err.Fprint(os.Stderr, "ERR ")
 	normal.Fprintln(os.Stderr, message)
 	if len(objs) > 0 {
 		for _, obj := range objs {
-			if errObj, ok := obj.(error); ok && !continueOnError {
+			if errObj, ok := obj.(error); ok && !ContinueOnError {
 				panic(errObj)
 			} else {
 				normal.Fprintln(os.Stderr, obj)
 			}
 		}
 	}
-	if !continueOnError {
+	if !ContinueOnError {
 		os.Exit(1)
 	}
 }

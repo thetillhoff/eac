@@ -18,21 +18,22 @@ var initCmd = &cobra.Command{
   eac init`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		logs.ContinueOnError = continueOnError
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'platform':", continueOnError, err)
+			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
 		if _, err := os.Stat(appsDirPath); os.IsNotExist(err) {
 			err := os.Mkdir(appsDirPath, os.ModePerm)
 			if err != nil {
-				logs.Err("Couldn't create appsDir at '"+appsDirPath+"':", continueOnError, err)
+				logs.Err("Couldn't create appsDir at '"+appsDirPath+"':", err)
 			}
 			logs.Info("Created '" + appsDirPath + "' folder.")
 		} else if err == nil {
 			appsDir, err := os.Open(appsDirPath) // open appsDir to check if it's empty
 			if err != nil {
-				logs.Err("There was a problem opening appsDir at '"+appsDirPath+"':", continueOnError, err)
+				logs.Err("There was a problem opening appsDir at '"+appsDirPath+"':", err)
 			}
 			defer appsDir.Close()
 
@@ -41,10 +42,10 @@ var initCmd = &cobra.Command{
 				logs.Warn("Folder '"+appsDirPath+"' isn't empty or another problem occured while accessing it:", err)
 			}
 		} else {
-			logs.Err("There was a problem while accessing appsDir at '"+appsDirPath+"':", continueOnError, err)
+			logs.Err("There was a problem while accessing appsDir at '"+appsDirPath+"':", err)
 		}
 
-		apps.Create([]string{"eac"}, flaggedPlatforms, shell, appsDirPath, true, verbose)
+		apps.Create([]string{"eac"}, flaggedPlatforms, shell, appsDirPath, verbose)
 	},
 }
 

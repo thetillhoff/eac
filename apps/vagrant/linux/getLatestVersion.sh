@@ -2,7 +2,7 @@
 
 # This script has to print (only!) the version of the app to stdout. Trailing newlines are fine though.
 # Example:
-sudo apt-get install curl -y
+#sudo apt-get install curl -y
 curl --silent "https://releases.hashicorp.com/vagrant/" |
 	grep '>vagrant_' |
 	cut -d'_' -f2 |

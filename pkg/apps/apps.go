@@ -4,10 +4,13 @@ import (
 	"strings"
 
 	"github.com/thetillhoff/eac/internal/app"
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func apps(appNames []string, shell string, continueOnError bool) []app.App {
+func apps(appNames []string, shell string, versionsFilePath string) []app.App {
 	apps := []app.App{}
+
+	loadVersions(versionsFilePath)
 
 	for _, arg := range appNames {
 		wantedVersion := ""
@@ -20,8 +23,10 @@ func apps(appNames []string, shell string, continueOnError bool) []app.App {
 		}
 
 		//TOOD if wantedVersion is empty when installing, retrieve latest version first
+		appItem := newApp(arg, app.WantedVersion(wantedVersion), app.Shell(shell))
+		logs.Info("app:", appItem)
 
-		apps = append(apps, newApp(arg, app.WantedVersion(wantedVersion), app.Shell(shell), app.ContinueOnError(continueOnError)))
+		apps = append(apps, appItem)
 	}
 
 	return apps

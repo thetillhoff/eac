@@ -49,7 +49,7 @@ func (app App) Validate(appsDirPath string, platform string) (string, error) {
 	} else {
 		out = out + "The local version for app '" + app.Name + "' could be retrieved.\n"
 	}
-	latestVersion := app.GetLatestVersion(appsDirPath, platform)
+	latestVersion := app.LatestVersion(appsDirPath, platform)
 	if strings.Contains(latestVersion, "\n") {
 		err := "The latest version for app '" + app.Name + "' can't be retrieved. The result should be one line, but is:\n"
 		err = err + latestVersion

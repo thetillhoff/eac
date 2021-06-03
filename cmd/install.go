@@ -15,20 +15,21 @@ var installCmd = &cobra.Command{
 	eac install app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		logs.ContinueOnError = continueOnError
 		noConfigure, err := cmd.Flags().GetBool("no-configure")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'no-configure':", continueOnError, err)
+			logs.Err("There was an error while reading the flag 'no-configure':", err)
 		}
 		update, err := cmd.Flags().GetBool("update")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'update':", continueOnError, err)
+			logs.Err("There was an error while reading the flag 'update':", err)
 		}
 		latest, err := cmd.Flags().GetBool("latest")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'latest':", continueOnError, err)
+			logs.Err("There was an error while reading the flag 'latest':", err)
 		}
 
-		apps.Install(args, noConfigure, update, shell, appsDirPath, continueOnError, versionsFilePath, latest, verbose) // Install apps
+		apps.Install(args, noConfigure, update, shell, appsDirPath, versionsFilePath, latest, verbose) // Install apps
 	},
 }
 
