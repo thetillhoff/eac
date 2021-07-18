@@ -28,10 +28,10 @@ curl --silent "https://api.github.com/repos/%[1]v/%[1]v/releases/latest" |
 `,
 		"install.sh": `#/bin/sh
 
-# $1==appName
+# $1==appVersion
 # $2==tmpFolder, gets created before this script is called and deleted afterwards
 
-wget -q "https://github.com/thetillhoff/%[1]v/releases/download/v$1/%[1]v-linux-amd64" -O "$2/%[1]v-linux-amd64"
+wget -q "https://github.com/%[1]v/%[1]v/releases/download/v$1/%[1]v-linux-amd64" -O "$2/%[1]v-linux-amd64"
 sudo install -D -g root -o root -m 755 "$2/%[1]v-linux-amd64" "/usr/local/bin/%[1]v"
 # install SRC DEST: copies SRC to DEST, changes DEST permissions, owners in one command
 # install -D: create all leading components of DEST except the last
@@ -52,7 +52,7 @@ echo "This script is called to configure of app %[1]v."
 
 # This script has to print (only!) the version of the app to stdout. Trailing newlines are fine though.
 # Example:
-curl --silent "https://api.github.com/repos/thetillhoff/%[1]v/releases/latest" |
+curl --silent "https://api.github.com/repos/%[1]v/%[1]v/releases/latest" |
 	grep 'tag_name' | # f.e. '  "tag_name": "v1.2.3",'
 	cut -d'"' -f4 | # f.e. 'v1.2.3'
 	cut -c2- # f.e. '1.2.3'

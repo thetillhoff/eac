@@ -97,6 +97,7 @@ func (app App) String() string {
 	appString = appString + "LatestVersion: " + app.latestVersion + "\n"
 	appString = appString + "LocalVersionScript: " + app.getLocalVersionScript + "\n"
 	appString = appString + "LatestVersionScript: " + app.getLatestVersionScript + "\n"
+	appString = appString + "InstallScript: " + app.installScript + "\n"
 	appString = appString + "UninstallScript: " + app.uninstallScript + "\n"
 
 	return appString
