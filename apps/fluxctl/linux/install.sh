@@ -3,10 +3,8 @@
 # $1==appVersion
 # $2==tmpFolder, gets created before this script is called and deleted afterwards
 
-wget -q "https://get.helm.sh/helm-v$1-linux-amd64.tar.gz" -O "$2/helm-v$1-linux-amd64.tar.gz"
-mkdir $2/extracted
-tar -xzf "$2/helm-v$1-linux-amd64.tar.gz" -C "$2/extracted" --strip-components 1
-sudo install -D -g root -o root -m 755 "$2/extracted/helm" "/usr/local/bin/helm"
+wget -q "https://github.com/fluxcd/flux/releases/download/$1/fluxctl_linux_amd64" -O "$2/fluxctl-linux-amd64"
+sudo install -D -g root -o root -m 755 "$2/fluxctl-linux-amd64" "/usr/local/bin/fluxctl"
 # install SRC DEST: copies SRC to DEST, changes DEST permissions, owners in one command
 # install -D: create all leading components of DEST except the last
 # install -g root: change group ownership of DEST
