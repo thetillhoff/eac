@@ -35,7 +35,11 @@ func Warn(message string, objs ...interface{}) {
 	warn.Fprint(os.Stdout, "WRN ")
 	normal.Fprintln(os.Stdout, message)
 	if len(objs) > 0 {
-		normal.Fprintln(os.Stdout, objs)
+		for _, obj := range objs {
+			if obj != nil {
+				normal.Fprintln(os.Stdout, obj)
+			}
+		}
 	}
 }
 func Err(message string, objs ...interface{}) {
@@ -44,7 +48,9 @@ func Err(message string, objs ...interface{}) {
 	if len(objs) > 0 {
 		for _, obj := range objs {
 			if errObj, ok := obj.(error); ok && !ContinueOnError {
-				normal.Fprintln(os.Stderr, errObj)
+				if errObj != nil {
+					normal.Fprintln(os.Stderr, errObj)
+				}
 			} else {
 				normal.Fprintln(os.Stderr, obj)
 			}

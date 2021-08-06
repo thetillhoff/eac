@@ -1,5 +1,4 @@
 #/bin/sh
 
 # This script has to print (only!) the version of the app to stdout. Trailing newlines are fine though.
-# Example:
-printf "\n" # if retrieval failed
+printf ".\n" # no version needed

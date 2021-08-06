@@ -24,6 +24,19 @@ var initCmd = &cobra.Command{
 			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
+		// creating versionsFile when not exists
+		if _, err := os.Stat(versionsFilePath); os.IsNotExist(err) { // check if file exists; if not exists
+			versionsFile, err := os.Create(versionsFilePath)
+			if err != nil {
+				logs.Err("Couldn't create versionsFile at '"+versionsFilePath+"':", err)
+			} else {
+				logs.Success("Created versionsFile.")
+			}
+			versionsFile.Close()
+		} else { // when file does exist
+			logs.Info("versionsFile already exists.")
+		}
+
 		if _, err := os.Stat(appsDirPath); os.IsNotExist(err) {
 			err := os.Mkdir(appsDirPath, os.ModePerm)
 			if err != nil {
@@ -39,7 +52,11 @@ var initCmd = &cobra.Command{
 
 			_, err = appsDir.Readdirnames(1)
 			if err != io.EOF { // check if appsDir is empty
-				logs.Warn("Folder '"+appsDirPath+"' isn't empty or another problem occured while accessing it:", err)
+				if err == nil {
+					logs.Warn("Folder '" + appsDirPath + "' isn't empty.")
+				} else {
+					logs.Warn("Folder '"+appsDirPath+"' isn't accessible;", err)
+				}
 			}
 		} else {
 			logs.Err("There was a problem while accessing appsDir at '"+appsDirPath+"':", err)

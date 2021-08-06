@@ -29,7 +29,8 @@ func Create(appNames []string, flaggedPlatforms []string, shell string, appsDirP
 			}
 			logs.Success("Created app '" + appName + "'.")
 		} else if err == nil { // if folder does exist
-			logs.Err("App '" + appName + "' does already exist.")
+			logs.Warn("App '" + appName + "' does already exist.")
+			return
 		} else {
 			logs.Err("There was an error while accessing the app at '"+appPath+"':", err)
 		}
