@@ -1,6 +1,6 @@
 #/bin/sh
 
-# $1==appName
+# $1==appVersion
 # $2==tmpFolder, gets created before this script is called and deleted afterwards
 
 # curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -

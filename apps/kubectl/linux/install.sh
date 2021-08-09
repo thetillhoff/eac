@@ -1,6 +1,6 @@
 #/bin/sh
 
-# $1==appName
+# $1==appVersion
 # $2==tmpFolder, gets created before this script is called and deleted afterwards
 
 wget -q "https://dl.k8s.io/release/v$1/bin/linux/amd64/kubectl" -O "$2/kubectl"

@@ -1,6 +1,6 @@
 #/bin/sh
 
-# $1==appName
+# $1==appVersion
 # $2==tmpFolder, gets created before this script is called and deleted afterwards
 
 wget -q "https://github.com/thetillhoff/eac/releases/download/v$1/eac-linux-amd64" -O "$2/eac-linux-amd64"

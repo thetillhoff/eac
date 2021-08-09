@@ -3,8 +3,8 @@
 # $1==appVersion
 # $2==tmpFolder, gets created before this script is called and deleted afterwards
 
-wget -q "https://github.com/kubernetes-sigs/cluster-api/releases/download/v$1/clusterctl-linux-amd64" -O "$2/clusterctl-linux-amd64"
-sudo install -D -g root -o root -m 755 "$2/clusterctl-linux-amd64" "/usr/local/bin/clusterctl"
+wget -q "https://github.com/thetillhoff/java/releases/download/v$1/java-linux-amd64" -O "$2/java-linux-amd64"
+sudo install -D -g root -o root -m 755 "$2/java-linux-amd64" "/usr/local/bin/java"
 # install SRC DEST: copies SRC to DEST, changes DEST permissions, owners in one command
 # install -D: create all leading components of DEST except the last
 # install -g root: change group ownership of DEST
