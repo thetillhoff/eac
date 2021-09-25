@@ -12,9 +12,10 @@ import (
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete specified app from eac tree.",
-	Long: `Delete the file-structure for the specified app. Example call:
-	eac delete demo`,
-	Args: cobra.ExactArgs(1),
+	Long: `Delete the file-structure for the specified apps. Examples:
+	eac delete demo
+	eac delete demo1 demo2`,
+	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = continueOnError
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")

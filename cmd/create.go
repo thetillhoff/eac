@@ -12,9 +12,10 @@ import (
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create the structure for a new app.",
-	Long: `Create initial file-structure for a new app with specified name. Example:
-  eac create demo`,
-	Args: cobra.ExactArgs(1),
+	Long: `Create initial file-structure for new apps with specified names. Examples:
+  eac create demo
+	eac create demo1 demo2`,
+	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = continueOnError
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
