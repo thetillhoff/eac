@@ -22,7 +22,7 @@ var deleteCmd = &cobra.Command{
 			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
-		apps.Delete(args, flaggedPlatforms, shell, appsDirPath, verbose)
+		apps.Delete(args, flaggedPlatforms, appsDirPath, verbose)
 	},
 }
 

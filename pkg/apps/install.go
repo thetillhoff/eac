@@ -6,9 +6,9 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Install(appNames []string, noConfigure bool, update bool, shell string, appsDirPath string, versionsFilePath string, latest bool, verbose bool) {
+func Install(appNames []string, noConfigure bool, update bool, appsDirPath string, versionsFilePath string, latest bool, verbose bool) {
 	logs.Verbose = verbose
-	apps := apps(appNames, shell, versionsFilePath)
+	apps := apps(appNames, versionsFilePath)
 
 	// if not latest
 	//   if not update

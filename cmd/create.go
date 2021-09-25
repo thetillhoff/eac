@@ -22,7 +22,7 @@ var createCmd = &cobra.Command{
 			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
-		apps.Create(args, flaggedPlatforms, shell, appsDirPath, verbose)
+		apps.Create(args, flaggedPlatforms, appsDirPath, verbose)
 	},
 }
 

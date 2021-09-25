@@ -11,19 +11,6 @@ import (
 func (app App) Validate(appsDirPath string, platform string) (string, error) {
 	out := ""
 
-	shellpath := []string{app.shell}
-	if strings.Contains(app.shell, " ") { // if shell contains spaces (and therefore arguments)
-		// don't edit the app.shell directly, as it is later used to retrieve the local and latest version. Instead edit the copy in shellpath.
-		shellpath = []string{strings.Split(app.shell, " ")[0]} // remove those arguments (before checking for file existance)
-	}
-
-	if len(testFiles(shellpath...)) == 0 {
-		out = out + "The shell for '" + app.Name + "' exists.\n"
-	} else {
-		err := "The shell '" + app.shell + "' for app '" + app.Name + "' doesn't exist."
-		return "", errors.New(err)
-	}
-
 	scriptpaths := []string{}
 	scriptpaths = append(scriptpaths, path.Join(appsDirPath, app.Name, platform, app.getLocalVersionScript))
 	scriptpaths = append(scriptpaths, path.Join(appsDirPath, app.Name, platform, app.installScript))

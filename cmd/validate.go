@@ -22,7 +22,7 @@ var validateCmd = &cobra.Command{
 			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
-		apps.Validate(args, flaggedPlatforms, shell, appsDirPath, verbose, versionsFilePath)
+		apps.Validate(args, flaggedPlatforms, appsDirPath, verbose, versionsFilePath)
 	},
 }
 

@@ -15,7 +15,7 @@ var configureCmd = &cobra.Command{
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = continueOnError
-		apps.Configure(args, shell, appsDirPath, verbose, true, versionsFilePath) // checkLocalVersion by default
+		apps.Configure(args, appsDirPath, verbose, true, versionsFilePath) // checkLocalVersion by default
 	},
 }
 

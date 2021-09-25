@@ -29,7 +29,7 @@ var installCmd = &cobra.Command{
 			logs.Err("There was an error while reading the flag 'latest':", err)
 		}
 
-		apps.Install(args, noConfigure, update, shell, appsDirPath, versionsFilePath, latest, verbose) // Install apps
+		apps.Install(args, noConfigure, update, appsDirPath, versionsFilePath, latest, verbose) // Install apps
 	},
 }
 

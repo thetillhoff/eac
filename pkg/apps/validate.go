@@ -4,9 +4,9 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Validate(appNames []string, flaggedPlatforms []string, shell string, appsDirPath string, verbose bool, versionsFilePath string) {
+func Validate(appNames []string, flaggedPlatforms []string, appsDirPath string, verbose bool, versionsFilePath string) {
 	logs.Verbose = verbose
-	apps := apps(appNames, shell, versionsFilePath)
+	apps := apps(appNames, versionsFilePath)
 
 	platforms := ResolvePlatforms(flaggedPlatforms)
 

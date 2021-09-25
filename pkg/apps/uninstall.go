@@ -6,9 +6,9 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Uninstall(appNames []string, shell string, appsDirPath string, verbose bool, versionsFilePath string) {
+func Uninstall(appNames []string, appsDirPath string, verbose bool, versionsFilePath string) {
 	logs.Verbose = verbose
-	apps := apps(appNames, shell, versionsFilePath)
+	apps := apps(appNames, versionsFilePath)
 
 	for _, appItem := range apps {
 		out, err := appItem.Uninstall(appsDirPath, runtime.GOOS)

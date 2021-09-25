@@ -23,7 +23,7 @@ var updateCmd = &cobra.Command{
 		if err != nil {
 			logs.Err("There was an error while reading the flag 'skip-local':", err)
 		}
-		apps.Update(args, shell, appsDirPath, versionsFilePath, dryRun, skipLocal, verbose)
+		apps.Update(args, appsDirPath, versionsFilePath, dryRun, skipLocal, verbose)
 	},
 }
 

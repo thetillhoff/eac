@@ -62,7 +62,7 @@ var initCmd = &cobra.Command{
 			logs.Err("There was a problem while accessing appsDir at '"+appsDirPath+"':", err)
 		}
 
-		apps.Create([]string{"eac"}, flaggedPlatforms, shell, appsDirPath, verbose)
+		apps.Create([]string{"eac"}, flaggedPlatforms, appsDirPath, verbose)
 	},
 }
 

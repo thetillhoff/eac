@@ -10,7 +10,7 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Create(appNames []string, flaggedPlatforms []string, shell string, appsDirPath string, verbose bool) {
+func Create(appNames []string, flaggedPlatforms []string, appsDirPath string, verbose bool) {
 	logs.Verbose = verbose
 	platforms := ResolvePlatforms(flaggedPlatforms)
 

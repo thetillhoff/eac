@@ -7,7 +7,7 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Delete(appNames []string, flaggedPlatforms []string, shell string, appsDirPath string, verbose bool) {
+func Delete(appNames []string, flaggedPlatforms []string, appsDirPath string, verbose bool) {
 	logs.Verbose = verbose
 	for _, appName := range appNames { // for all apps
 		appPath := path.Join(appsDirPath, appName)

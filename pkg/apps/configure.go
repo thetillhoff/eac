@@ -6,9 +6,9 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Configure(appNames []string, shell string, appsDirPath string, verbose bool, checkLocalVersion bool, versionsFilePath string) {
+func Configure(appNames []string, appsDirPath string, verbose bool, checkLocalVersion bool, versionsFilePath string) {
 	logs.Verbose = verbose
-	apps := apps(appNames, shell, versionsFilePath)
+	apps := apps(appNames, versionsFilePath)
 
 	for _, appItem := range apps {
 		if checkLocalVersion {

@@ -7,7 +7,7 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func apps(appNames []string, shell string, versionsFilePath string) []app.App {
+func apps(appNames []string, versionsFilePath string) []app.App {
 	apps := []app.App{}
 
 	loadVersions(versionsFilePath)
@@ -23,7 +23,7 @@ func apps(appNames []string, shell string, versionsFilePath string) []app.App {
 		}
 
 		//TOOD if wantedVersion is empty when installing, retrieve latest version first
-		appItem := newApp(arg, app.WantedVersion(wantedVersion), app.Shell(shell))
+		appItem := newApp(arg, app.WantedVersion(wantedVersion))
 		logs.Info("app:", appItem)
 
 		apps = append(apps, appItem)

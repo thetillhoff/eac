@@ -8,7 +8,7 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func RunScript(shell string, appName string, appsDirPath string, platform string, script string, args ...string) (string, error) {
+func RunScript(appName string, appsDirPath string, platform string, script string, args ...string) (string, error) {
 	var (
 		cmd *exec.Cmd
 	)
@@ -22,12 +22,7 @@ func RunScript(shell string, appName string, appsDirPath string, platform string
 
 	command := strings.Join(scriptWithArgs, " ") + ""
 
-	if strings.Contains(shell, " ") { // f.e. '/bin/sh -c'
-		splittedShell := strings.Split(shell, " ")
-		cmd = exec.Command(splittedShell[0], splittedShell[1], command) // sadly, the param '-c' cannot be prepended to 'command', go doesn't like that somehow (invalid param)
-	} else {
-		cmd = exec.Command(shell, command)
-	}
+	cmd = exec.Command("/bin/sh", "-c", command) // sadly, the param '-c' cannot be prepended to 'command', go doesn't like that somehow (invalid param)
 	outBytes, err := cmd.CombinedOutput()
 	out := strings.TrimSuffix(string(outBytes), "\n")
 	if err != nil {

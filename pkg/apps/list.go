@@ -18,7 +18,7 @@ func List(appsDirPath string, versionsFilePath string, noVersion bool, seperator
 	for _, contentItem := range appsDirContents {
 		appNames = append(appNames, contentItem.Name())
 	}
-	apps := apps(appNames, "", versionsFilePath) // continueOnError set to false, as this the whole command won't work then
+	apps := apps(appNames, versionsFilePath) // continueOnError set to false, as this the whole command won't work then
 
 	items := []string{}
 	for _, appItem := range apps {

@@ -15,7 +15,7 @@ var uninstallCmd = &cobra.Command{
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = continueOnError
-		apps.Uninstall(args, shell, appsDirPath, verbose, versionsFilePath) // Uninstall apps
+		apps.Uninstall(args, appsDirPath, verbose, versionsFilePath) // Uninstall apps
 	},
 }
 

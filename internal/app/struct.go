@@ -7,7 +7,6 @@ type App struct {
 	configureScript        string // script that configures the app (if installed)
 	getLatestVersionScript string // script that checks for new versions of the app
 	uninstallScript        string // script that uninstalls the app
-	shell                  string // set specific shell to use for the scripts of this app
 	WantedVersion          string // version of this app, which is desired to be installed
 	localVersion           string // version of this app, which is currently installed
 	latestVersion          string // latest available version of this app
@@ -15,13 +14,6 @@ type App struct {
 
 type AppOption func(*App)
 
-func Shell(s string) AppOption {
-	return func(a *App) {
-		if s != "" {
-			a.Name = s
-		}
-	}
-}
 func GetLocalVersionScript(s string) AppOption {
 	return func(a *App) {
 		if s != "" {
@@ -69,7 +61,6 @@ func WantedVersion(s string) AppOption {
 func New(appName string, options ...AppOption) *App {
 
 	appItem := &App{ // initialize with default values
-		shell:                  "/bin/sh -c",
 		Name:                   appName,
 		getLocalVersionScript:  "getLocalVersion.sh",
 		installScript:          "install.sh",
@@ -91,7 +82,6 @@ func New(appName string, options ...AppOption) *App {
 func (app App) String() string {
 	appString := ""
 	appString = appString + "Name: " + app.Name + "\n"
-	appString = appString + "Shell: " + app.shell + "\n"
 	appString = appString + "WantedVersion: " + app.WantedVersion + "\n"
 	appString = appString + "LocalVersion: " + app.localVersion + "\n"
 	appString = appString + "LatestVersion: " + app.latestVersion + "\n"
