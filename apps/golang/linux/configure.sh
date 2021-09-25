@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 if test -f "$HOME/.profile"; then # if bashrc is used
   if ! grep -q 'export GOROOT=/usr/local/go' "$HOME/.profile"; then # if goroot is not configured

@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 if test -f "$HOME/.bashrc"; then # if bashrc is used
   if ! grep -q "source /etc/bash_completion" "$HOME/.bashrc"; then # if autocompletion is disabled

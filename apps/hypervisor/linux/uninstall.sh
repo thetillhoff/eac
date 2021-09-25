@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 sudo apt-get purge -y \
   qemu-kvm
