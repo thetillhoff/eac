@@ -12,7 +12,6 @@ import (
 
 var (
 	cfgFile          string
-	shell            string
 	continueOnError  bool
 	verbose          bool
 	appsDirPath      = path.Clean("apps") //TODO make this an absolute path, so eac can be added to $PATH (don't forget to edit helptext for it) // -> do this, when deciding where to put eac on linux systems, windows systems and their corresponding apps-dir
