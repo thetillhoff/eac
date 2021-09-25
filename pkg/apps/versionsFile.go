@@ -26,7 +26,7 @@ func getVersion(appName string) string {
 }
 
 func loadVersions(filepath string) {
-	//TODO: allow multiple version files to be passed to the commands; -f, --values // -> flag in cmd/root.go, but functionallity here
+	//TODO: allow multiple version files to be passed to the commands; -f, --values // -> flag in cmd/root.go, but functionality here
 
 	var mapObject map[string]interface{}
 	fileContents, err := ioutil.ReadFile(filepath)

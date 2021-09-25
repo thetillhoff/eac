@@ -14,7 +14,7 @@ var deleteCmd = &cobra.Command{
 	Short: "Delete specified app from eac tree.",
 	Long: `Delete the file-structure for the specified app. Example call:
 	eac delete demo`,
-	Args: cobra.MinimumNArgs(1),
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = continueOnError
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")

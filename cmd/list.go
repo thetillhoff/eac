@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
@@ -25,7 +23,7 @@ var listCmd = &cobra.Command{
 		if err != nil {
 			logs.Err("There was an error while reading the flag 'seperator':", err)
 		}
-		fmt.Println("Format: <app>[==<installedVersion>]")
+		// fmt.Println("Format: <app>[==<installedVersion>]")
 		apps.List(appsDirPath, versionsFilePath, noVersion, seperator, verbose)
 	},
 }

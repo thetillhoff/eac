@@ -37,6 +37,7 @@ var initCmd = &cobra.Command{
 			logs.Info("versionsFile already exists.")
 		}
 
+		// Creating appsDir
 		if _, err := os.Stat(appsDirPath); os.IsNotExist(err) {
 			err := os.Mkdir(appsDirPath, os.ModePerm)
 			if err != nil {
