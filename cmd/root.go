@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"path"
 
 	"github.com/spf13/cobra"
@@ -14,8 +15,8 @@ var (
 	cfgFile          string
 	continueOnError  bool
 	verbose          bool
-	appsDirPath      = path.Clean("apps") //TODO make this an absolute path, so eac can be added to $PATH (don't forget to edit helptext for it) // -> do this, when deciding where to put eac on linux systems, windows systems and their corresponding apps-dir
-	versionsFilePath = path.Clean("versions.yaml")
+	appsDirPath      string //TODO add eac to $PATH (don't forget to edit helptext for it)
+	versionsFilePath string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -51,6 +52,14 @@ func init() {
 	// when this action is called directly.
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
+	// Set the default paths
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		logs.Err("Can't retrieve userHomeDir", err)
+	}
+	eacDir := path.Join(userHomeDir, ".eac")
+	appsDirPath = path.Join(eacDir, "apps")
+	versionsFilePath = path.Join(eacDir, "versions.yaml")
 }
 
 // initConfig reads in config file and ENV variables if set.

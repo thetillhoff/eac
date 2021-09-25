@@ -3,6 +3,7 @@ package cmd
 import (
 	"io"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -22,6 +23,32 @@ var initCmd = &cobra.Command{
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
 			logs.Err("There was an error while reading the flag 'platform':", err)
+		}
+
+		// Creating ~/.eac folder
+		if _, err := os.Stat(path.Dir(appsDirPath)); os.IsNotExist(err) {
+			err := os.Mkdir(path.Dir(appsDirPath), os.ModePerm)
+			if err != nil {
+				logs.Err("Can't create folder at '"+path.Dir(appsDirPath)+"':", err)
+			}
+			logs.Info("Created folder at '" + path.Dir(appsDirPath) + "'.")
+		} else if err == nil {
+			dir, err := os.Open(path.Dir(appsDirPath)) // open folder to check if it's empty
+			if err != nil {
+				logs.Err("There was a problem opening folder at '"+path.Dir(appsDirPath)+"':", err)
+			}
+			defer dir.Close()
+
+			_, err = dir.Readdirnames(1)
+			if err != io.EOF { // check if appsDir is empty
+				if err == nil {
+					logs.Warn("Folder '" + path.Dir(appsDirPath) + "' isn't empty.")
+				} else {
+					logs.Warn("Folder '"+path.Dir(appsDirPath)+"' isn't accessible;", err)
+				}
+			}
+		} else {
+			logs.Err("There was a problem while accessing folder at '"+path.Dir(appsDirPath)+"':", err)
 		}
 
 		// creating versionsFile when not exists
