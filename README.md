@@ -23,27 +23,61 @@ So when I again searched for some stupid installation commands, I bore the idea 
 ## The vision
 
 eac's goal is to
-- be a simple app management tool - simple as in simple to understand and simple to use,
-- make it easy to install a specific version of a software,
-- make the same apps available on all (or at least the most important) platforms in the same way,
-- enable me to use shell commands (or even better: shell-scripts) for each installation, configuration, uninstallation, ... - I mean the installation-instructions are already given by the app developers, why would you require users to migrate those commands to another format (and then probably format them back to the initial commands)?
+- be a simple app management tool - simple as in simple to understand and simple to use. When the input is ambiguous, ask the user.
+- make it easy to install a specific version of a software.
+- make the same apps available on all (or at least the most) platforms in the same way.
+- enable the user to use shell commands (or even better: shell-scripts) for each installation, configuration, uninstallation, ... - The installation-instructions are already given by the app developers, why would you require users to migrate those commands to another format (and then probably format them back for the actual execution)?
+- enable the user to script its usage. It should be easy to use eac in scripts and other tools. All interactive parts must be able to be configured via flags.
 
-Out of scope:
-- dependency management of any kind
+Out of scope is dependency management of any kind.
 
 ## The name
 
 `eac` stands for `environment-as-code`.
 
-I wanted a short name and it should be unique, too. The meaning of "iac" is basically it, but I guess that would be not only confusing but also not properly fitting - eac is only for managing my local environment.
+I (the author) wanted a short name and it should be unique, too. It is about "iac", but that name would not only be confusing but also not properly fitting - eac is only for managing my local _environment_.
+
+
+## The features
+
+### Everyday features
+
+- [x] `eac init` creates the folder structure (`~/.apps`) and adds the first app: eac itself. This includes creating the `versions.yaml` at `~/.apps/versions.yaml`.
+- [ ] `eac list` prints all apps that are managed via `eac` (== contained in `versions.yaml`). Per default one app per line in the format `<app>[==<installedVersion>]`. The seperator can be edited with a flag.
+  [ ] `eac list local` lists all apps that are available locally.
+  [ ] `eac list online` lists all apps that are available online.
+  [ ] `eac list all` lists all apps that are available locally and/or online.
+  [ ] `eac list installed` lists only the installed apps. Created by trying to run the getLocalVersion script.
+- [ ] `eac install <appname>[==<version>][ <appname>[==<version>]*]` installs the apps with the provided names. If no version for the app is specified in `versions.yaml`, add it.
+  [ ] If not locally available, check whether the repository contains the app. If yes, ask the user to download it automatically and install then. If not, recommend the user to create it with `eac create`. The former can be disabled with `--offline`
+  [ ] `eac install` checks whether all apps are installed as described in `versions.yaml`. If not (or the getLocalVersion script fails), the app is installed.
+- [ ] `eac uninstall <appname>[ <appname>*]` uninstalls the apps with the provided names. Removes the version from the `versions.yaml` (if exists).
+- [ ] `eac update[ <appname>*]` checks whether updates for the provided apps are available. If yes, only the version is updated, not the app. If no name is provided, all apps are checked.
+  [ ] `eac update[ <appname>*]` checks whether updates for the provided apps are available. If yes, the user is asked whether only the version should be updated or the app should be upgraded as well. If no app is provided, all apps are checked.
+  [ ] `--versions` only updates the version without asking the user.
+  [ ] `--upgrade` updates the version AND installs the app in the new version.
+- [ ] `eac upgrade[ <appname>*]` checks whether the desired version and the installed version of the provided apps are equal. For each app where this is not the case, install the desired version.
+
+### App maintainer features
+
+- [x] `eac create <appname>` creates the folder structure and default files for the new app under `apps`. Without additional flags only default files for the current OS are created.
+  [ ] `--no-default-files` disables creation of default files completely (-> only the folders are created).
+  [x] `--platform [linux,darwin,windows,all]` creates the folders and default files for the specified platform(s). Multiple occurances of this flag are possible.
+  [x] `--githubUser <githubUser>` adjusts the default files so they fit for github releases. The githubUser is the owner of the repository.
+- [ ] `eac validate <appname>[ <appname>*]` checks whether the app configurations are set up in a valid way. TODO what exactly is validated here?
+- [x] `eac delete <appname>` deletes the folder structure and all contents for the specified app.
+  [x] `--platform [linux,darwin,windows,all]` deletes only the folders and files for the specified platform(s). Multiple occurances of this flag are possible.
 
 
 ## The roadmap
 
 > "My" in the following context means the owner(s)/author(s)/member(s) of this tool. Currently this is only me and I think its easier to write from my point of view anyway.
 
+- `eac install` and `eac upgrade` should uninstall the old version first. At least for golang this is required. On the other hand, this would delete all settings...
+  Maybe this is better added to the install script of the app itself.
 - Add helper-scripts for common installation options, f.e. "common/apt-install.sh <package-name> <repo-url> <repo-key-url>", "common/github-getLatestVersion.sh <repo-owner> <repo-name>". The same could be done for getLatestVersion. This could alternatively  (or additionally) be added as param for create like `eac create <app> --github` or `eac create <app> --apt`.
   Create helpers/scripts/sources folder, where for each type of generic tool scripts can be placed. F.e. github binary release, github tar.gz release, github zip release, apt
+  Add helper-scripts for common tasks as well: Add to path, remove from path
 - Write down each possible command with description what is does and what it does not.
 - `eac update <app>` should not fail if app is not installed. Instead get the latest version and store it to the versions.yaml
   Make it possible to upgrade currently not installed apps, without trying to get a local version to compare to. -> compare only against versionsFile
