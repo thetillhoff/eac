@@ -13,7 +13,7 @@ import (
 
 var (
 	cfgFile          string
-	VersionString    string = "0.0.0" // Override at compile time with "-ldflags '-X cmd.VersionString=1.2.3'"
+	VersionString    string = "0.0.0" // Override at compile time with "-ldflags '-X github.com/thetillhoff/eac/cmd.VersionString=1.2.3'"
 	continueOnError  bool
 	verbose          bool
 	eacDirPath       string

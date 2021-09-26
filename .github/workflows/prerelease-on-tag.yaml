@@ -67,7 +67,7 @@ jobs:
           echo "architecture: ${{ matrix.architecture }}"
           go version
 
-          env GOOS=${{ matrix.os }} GOARCH=${{ matrix.architecture }} go build -o ./${{ env.APP_NAME }}_${{ matrix.os }}_${{ matrix.architecture }}${{ env.FILE_EXTENSION }}
+          env GOOS=${{ matrix.os }} GOARCH=${{ matrix.architecture }} go build -ldflags '-X github.com/{{ env.GITHUB_REPOSITORY }}/cmd.VersionString=${RELEASE_TAG:1}' -o ./${{ env.APP_NAME }}_${{ matrix.os }}_${{ matrix.architecture }}${{ env.FILE_EXTENSION }}
           # If FILE_EXTENSION is empty, there is no need to make the binary executable, because it is for windows.
           if test -z "${{ env.FILE_EXTENSION }}"; then chmod +x ./${{ env.APP_NAME }}_${{ matrix.os }}_${{ matrix.architecture }}${{ env.FILE_EXTENSION }}; fi
 
