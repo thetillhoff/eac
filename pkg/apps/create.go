@@ -1,18 +1,17 @@
 package apps
 
 import (
-	"fmt"
-	"io/fs"
-	"io/ioutil"
 	"os"
 	"path"
 
+	"github.com/thetillhoff/eac/internal/templates"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Create(appNames []string, flaggedPlatforms []string, appsDirPath string, verbose bool) {
+func Create(appNames []string, flaggedPlatforms []string, appsDirPath string, verbose bool, createData map[string]string) {
 	logs.Verbose = verbose
 	platforms := ResolvePlatforms(flaggedPlatforms)
+	logs.Info("Selected platforms:", platforms)
 
 	if _, err := os.Stat(appsDirPath); os.IsNotExist(err) {
 		logs.Err("Apps folder at '" + appsDirPath + "' doesn't exist.\nPlease run 'eac init' first.")
@@ -49,19 +48,45 @@ func Create(appNames []string, flaggedPlatforms []string, appsDirPath string, ve
 				logs.Err("There was an error while accessing the platform '"+platform+"' for app '"+appPath+"' at '"+platformPath+"':", err)
 			}
 
-			platformDemoFiles := demoFiles[platform]
-
-			for filename, fileContent := range platformDemoFiles {
-
-				fileContent = fmt.Sprintf(fileContent, appName)
-
-				err := ioutil.WriteFile(path.Join(platformPath, filename), []byte(fileContent), fs.ModePerm)
-				if err != nil {
-					logs.Err("There was an error while writing to the file '"+filename+"' at '"+platformPath+"':", err)
+			if githubUser, ok := createData["githubUser"]; ok { // add github files
+				data := map[string]string{
+					"name": appName,
+					"user": githubUser,
 				}
-
-				logs.Info("Created '" + path.Join(platformPath, filename) + "' file.")
+				switch platform {
+				case "windows":
+					templates.WriteTemplateToFile(path.Join(platform, "github-install.ps1"), data, path.Join(platformPath, "install.ps1"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-uninstall.ps1"), data, path.Join(platformPath, "uninstall.ps1"))
+					templates.WriteTemplateToFile(path.Join(platform, "github-getLatestVersion.ps1"), data, path.Join(platformPath, "getLatestVersion.ps1"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-getLocalVersion.ps1"), data, path.Join(platformPath, "getLocalVersion.ps1"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-configure.ps1"), data, path.Join(platformPath, "configure.ps1"))
+				default:
+					templates.WriteTemplateToFile(path.Join(platform, "github-install.sh"), data, path.Join(platformPath, "install.sh"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-uninstall.sh"), data, path.Join(platformPath, "uninstall.sh"))
+					templates.WriteTemplateToFile(path.Join(platform, "github-getLatestVersion.sh"), data, path.Join(platformPath, "getLatestVersion.sh"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-getLocalVersion.sh"), data, path.Join(platformPath, "getLocalVersion.sh"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-configure.sh"), data, path.Join(platformPath, "configure.sh"))
+				}
+			} else { // default files
+				data := map[string]string{
+					"name": appName,
+				}
+				switch platform {
+				case "windows":
+					templates.WriteTemplateToFile(path.Join(platform, "default-install.ps1"), data, path.Join(platformPath, "install.ps1"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-uninstall.ps1"), data, path.Join(platformPath, "uninstall.ps1"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-getLatestVersion.ps1"), data, path.Join(platformPath, "getLatestVersion.ps1"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-getLocalVersion.ps1"), data, path.Join(platformPath, "getLocalVersion.ps1"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-configure.ps1"), data, path.Join(platformPath, "configure.ps1"))
+				default:
+					templates.WriteTemplateToFile(path.Join(platform, "default-install.sh"), data, path.Join(platformPath, "install.sh"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-uninstall.sh"), data, path.Join(platformPath, "uninstall.sh"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-getLatestVersion.sh"), data, path.Join(platformPath, "getLatestVersion.sh"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-getLocalVersion.sh"), data, path.Join(platformPath, "getLocalVersion.sh"))
+					templates.WriteTemplateToFile(path.Join(platform, "default-configure.sh"), data, path.Join(platformPath, "configure.sh"))
+				}
 			}
+
 			logs.Success("Created platform '" + platform + "' for app '" + appName + "'.")
 		}
 	}

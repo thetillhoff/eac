@@ -24,27 +24,29 @@ func Delete(appNames []string, flaggedPlatforms []string, appsDirPath string, ve
 			}
 			logs.Success("Deleted app '" + appName + "'.")
 		} else { // for specific platforms
-			platforms := ResolvePlatforms(flaggedPlatforms)
+			// platforms := ResolvePlatforms(flaggedPlatforms)
+			platforms := []string{}
 
 			for _, platform := range flaggedPlatforms { // validate specified platforms
 				if !IsValidPlatform(platform) { // references method 'isValidPlatform' in 'create.go'
 					logs.Err("Unkown platform: " + platform)
 				}
 				platforms = append(platforms, platform)
+			}
+			logs.Info("Selected platforms:", platforms)
 
-				for _, platform := range platforms {
-					platformPath := path.Join(appPath, platform)
-					if _, err := os.Stat(platformPath); os.IsNotExist(err) { // if folder doesn't exist
-						logs.Err("Folder '" + platformPath + "' for platform '" + platform + "' for app '" + appName + "' doesn't exist.")
-					} else if err != nil {
-						logs.Err("There was a problem while accessing platform '"+platform+"' for app '"+appName+"':", err)
-					}
-					err := os.RemoveAll(platformPath)
-					if err != nil {
-						logs.Err("There was a problem while deleting app '"+appName+"':", err)
-					}
-					logs.Success("Deleted platform '" + platformPath + "' for app '" + appName + "'.")
+			for _, platform := range platforms {
+				platformPath := path.Join(appPath, platform)
+				if _, err := os.Stat(platformPath); os.IsNotExist(err) { // if folder doesn't exist
+					logs.Err("Folder '" + platformPath + "' for platform '" + platform + "' for app '" + appName + "' doesn't exist.")
+				} else if err != nil {
+					logs.Err("There was a problem while accessing platform '"+platform+"' for app '"+appName+"':", err)
 				}
+				err := os.RemoveAll(platformPath)
+				if err != nil {
+					logs.Err("There was a problem while deleting app '"+appName+"':", err)
+				}
+				logs.Success("Deleted platform '" + platformPath + "' for app '" + appName + "'.")
 			}
 		}
 	}

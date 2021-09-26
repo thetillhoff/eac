@@ -23,7 +23,17 @@ var createCmd = &cobra.Command{
 			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
-		apps.Create(args, flaggedPlatforms, appsDirPath, verbose)
+		flaggedGithubUser, err := cmd.Flags().GetString("githubUser")
+		if err != nil {
+			logs.Err("There was an error while reading the flag 'githubUser':", err)
+		}
+
+		createData := map[string]string{}
+		if flaggedGithubUser != "" {
+			createData["githubUser"] = flaggedGithubUser
+		}
+
+		apps.Create(args, flaggedPlatforms, appsDirPath, verbose, createData)
 	},
 }
 
@@ -41,6 +51,8 @@ func init() {
 	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	createCmd.Flags().StringSliceP("platform", "p", []string{}, "Only create demo files for specified platforms. Valid options are ["+strings.Join(apps.ValidPlatforms(), "|")+"]")
+
+	createCmd.Flags().String("githubUser", "", "Create default files specifically for github.")
 
 	//TODO --fail-if-app-exists: bool
 	//TODO --fail-if-platform-exists: bool

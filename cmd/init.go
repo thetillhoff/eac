@@ -4,9 +4,11 @@ import (
 	"io"
 	"os"
 	"path"
+	"runtime"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/thetillhoff/eac/internal/templates"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
@@ -20,35 +22,36 @@ var initCmd = &cobra.Command{
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = continueOnError
+		logs.Verbose = verbose // needs to be done here, the other cmds pass it around
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
 			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
 		// Creating ~/.eac folder
-		if _, err := os.Stat(path.Dir(appsDirPath)); os.IsNotExist(err) {
-			err := os.Mkdir(path.Dir(appsDirPath), os.ModePerm)
+		if _, err := os.Stat(eacDirPath); os.IsNotExist(err) {
+			err := os.Mkdir(eacDirPath, os.ModePerm)
 			if err != nil {
-				logs.Err("Can't create folder at '"+path.Dir(appsDirPath)+"':", err)
+				logs.Err("Can't create folder at '"+eacDirPath+"':", err)
 			}
-			logs.Info("Created folder at '" + path.Dir(appsDirPath) + "'.")
+			logs.Info("Created folder at '" + eacDirPath + "'.")
 		} else if err == nil {
-			dir, err := os.Open(path.Dir(appsDirPath)) // open folder to check if it's empty
+			dir, err := os.Open(eacDirPath) // open folder to check if it's empty
 			if err != nil {
-				logs.Err("There was a problem opening folder at '"+path.Dir(appsDirPath)+"':", err)
+				logs.Err("There was a problem opening folder at '"+eacDirPath+"':", err)
 			}
 			defer dir.Close()
 
 			_, err = dir.Readdirnames(1)
 			if err != io.EOF { // check if appsDir is empty
 				if err == nil {
-					logs.Warn("Folder '" + path.Dir(appsDirPath) + "' isn't empty.")
+					logs.Warn("Folder '" + eacDirPath + "' isn't empty.")
 				} else {
-					logs.Warn("Folder '"+path.Dir(appsDirPath)+"' isn't accessible;", err)
+					logs.Warn("Folder '"+eacDirPath+"' isn't accessible;", err)
 				}
 			}
 		} else {
-			logs.Err("There was a problem while accessing folder at '"+path.Dir(appsDirPath)+"':", err)
+			logs.Err("There was a problem while accessing folder at '"+eacDirPath+"':", err)
 		}
 
 		// creating versionsFile when not exists
@@ -90,7 +93,30 @@ var initCmd = &cobra.Command{
 			logs.Err("There was a problem while accessing appsDir at '"+appsDirPath+"':", err)
 		}
 
-		apps.Create([]string{"eac"}, flaggedPlatforms, appsDirPath, verbose)
+		// Creating folder for shared scripts
+		if _, err := os.Stat(path.Join(eacDirPath, "shared")); os.IsNotExist(err) {
+			err := os.Mkdir(path.Join(eacDirPath, "shared"), os.ModePerm)
+			if err != nil {
+				logs.Err("Couldn't create appsDir at '"+eacDirPath+"':", err)
+			}
+			logs.Info("Created '" + path.Join(eacDirPath, "shared") + "' folder.")
+		} else if err == nil { // Folder is not empty
+			logs.Info("Folder '" + path.Join(eacDirPath, "shared") + "' is not empty.")
+		} else if err == io.EOF { // Folder exists but is empty
+			// Do nothing
+		} else { // Other errors
+			logs.Err("There was a problem while accessing folder at '"+path.Join(eacDirPath, "shared")+"':", err)
+		}
+
+		// Creating shared scripts
+		for _, sharedFile := range templates.GetSharedFiles() {
+			templates.WriteTemplateToFile(path.Join(runtime.GOOS, sharedFile), new(interface{}), path.Join(eacDirPath, "shared", strings.TrimPrefix(sharedFile, "shared-")))
+			logs.Info("Created '" + path.Join(eacDirPath, "shared", strings.TrimPrefix(sharedFile, "shared-")) + "' file.")
+		}
+
+		// Creating eac app
+		data := map[string]string{"githubUser": "thetillhoff"}
+		apps.Create([]string{"eac"}, flaggedPlatforms, appsDirPath, verbose, data)
 	},
 }
 

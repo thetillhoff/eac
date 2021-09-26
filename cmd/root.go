@@ -13,18 +13,20 @@ import (
 
 var (
 	cfgFile          string
+	VersionString    string = "0.0.0" // Override at compile time with "-ldflags '-X cmd.VersionString=1.2.3'"
 	continueOnError  bool
 	verbose          bool
-	appsDirPath      string //TODO add eac to $PATH (don't forget to edit helptext for it)
+	eacDirPath       string
+	appsDirPath      string
 	versionsFilePath string
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use: "eac",
-	// Version: "0.0.0", // TODO set proper version -> could be done with github action prior to build.
-	Short: "eac installs, configures, upgrads, downgrades and uninstalls applications.",
-	Long:  `eac installs, configures, upgrads, downgrades and uninstalls applications.`,
+	Use:     "eac",
+	Version: VersionString,
+	Short:   "eac installs, configures, upgrads, downgrades and uninstalls applications.",
+	Long:    `eac installs, configures, upgrads, downgrades and uninstalls applications.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -57,9 +59,9 @@ func init() {
 	if err != nil {
 		logs.Err("Can't retrieve userHomeDir", err)
 	}
-	eacDir := path.Join(userHomeDir, ".eac")
-	appsDirPath = path.Join(eacDir, "apps")
-	versionsFilePath = path.Join(eacDir, "versions.yaml")
+	eacDirPath = path.Join(userHomeDir, ".eac")
+	appsDirPath = path.Join(eacDirPath, "apps")
+	versionsFilePath = path.Join(eacDirPath, "versions.yaml")
 }
 
 // initConfig reads in config file and ENV variables if set.

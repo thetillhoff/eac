@@ -3,11 +3,12 @@ package apps
 import (
 	"runtime"
 
+	"github.com/thetillhoff/eac/internal/templates"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 func IsValidPlatform(potentialPlatform string) bool {
-	for platform := range demoFiles {
+	for _, platform := range templates.GetPlatforms() {
 		if platform == potentialPlatform {
 			return true
 		}
@@ -16,29 +17,25 @@ func IsValidPlatform(potentialPlatform string) bool {
 }
 
 func ValidPlatforms() []string {
-	validPlatforms := make([]string, 0, len(demoFiles))
-	for platform := range demoFiles {
-		validPlatforms = append(validPlatforms, platform)
-	}
-	validPlatforms = append(validPlatforms, "all")
+	validPlatforms := templates.GetPlatforms()
+	// validPlatforms = append(validPlatforms, "all")
 	return validPlatforms
 }
 
 func ResolvePlatforms(flaggedPlatforms []string) []string {
 	platforms := []string{}
 	for _, flaggedPlatform := range flaggedPlatforms {
-		if IsValidPlatform(flaggedPlatform) {
+		if IsValidPlatform(flaggedPlatform) && flaggedPlatform != "all" {
 			platforms = append(platforms, flaggedPlatform)
 		}
 		if flaggedPlatform == "all" {
-			if len(platforms) > 0 {
+			if len(flaggedPlatforms) > 1 {
 				logs.Warn("You set platforms to all, ignoring other specified platforms.")
 			}
-			platforms = ValidPlatforms()
-			continue
+			return ValidPlatforms()
 		}
 	}
-	if len(platforms) == 0 { // no specific platforms selected
+	if len(platforms) == 0 { // no specific platforms selected, therefore adding only the current one
 		platforms = append(platforms, runtime.GOOS)
 	}
 	return platforms

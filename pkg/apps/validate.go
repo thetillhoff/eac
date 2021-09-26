@@ -9,6 +9,7 @@ func Validate(appNames []string, flaggedPlatforms []string, appsDirPath string, 
 	apps := apps(appNames, versionsFilePath)
 
 	platforms := ResolvePlatforms(flaggedPlatforms)
+	logs.Info("Selected platforms:", platforms)
 
 	for _, appItem := range apps {
 		for _, platform := range platforms {
