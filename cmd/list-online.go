@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // onlineCmd represents the online command
@@ -48,4 +49,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// onlineCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	viper.BindPFlags(onlineCmd.Flags())
+	viper.UnmarshalExact(&conf)
 }

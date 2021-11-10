@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
@@ -17,13 +18,13 @@ var deleteCmd = &cobra.Command{
 	eac delete demo1 demo2`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logs.ContinueOnError = continueOnError
+		logs.ContinueOnError = conf.ContinueOnError
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
 			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
-		apps.Delete(args, flaggedPlatforms, appsDirPath, verbose)
+		apps.Delete(args, flaggedPlatforms, conf.AppsDirPath, conf.Verbose)
 	},
 }
 
@@ -41,4 +42,7 @@ func init() {
 	// deleteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	deleteCmd.Flags().StringSliceP("platform", "p", []string{}, "Only delete files for specified platforms. Valid options are ["+strings.Join(apps.ValidPlatforms(), "|")+"]")
+
+	viper.BindPFlags(deleteCmd.Flags())
+	viper.UnmarshalExact(&conf)
 }

@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
@@ -17,7 +18,7 @@ var createCmd = &cobra.Command{
 	eac create demo1 demo2`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logs.ContinueOnError = continueOnError
+		logs.ContinueOnError = conf.ContinueOnError
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
 			logs.Err("There was an error while reading the flag 'platform':", err)
@@ -33,7 +34,7 @@ var createCmd = &cobra.Command{
 			createData["githubUser"] = flaggedGithubUser
 		}
 
-		apps.Create(args, flaggedPlatforms, appsDirPath, verbose, createData)
+		apps.Create(args, flaggedPlatforms, conf.AppsDirPath, conf.Verbose, createData)
 	},
 }
 
@@ -56,4 +57,7 @@ func init() {
 
 	//TODO --fail-if-app-exists: bool
 	//TODO --fail-if-platform-exists: bool
+
+	viper.BindPFlags(createCmd.Flags())
+	viper.UnmarshalExact(&conf)
 }

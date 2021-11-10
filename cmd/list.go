@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
@@ -14,17 +15,9 @@ var listCmd = &cobra.Command{
 	eac list`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		logs.ContinueOnError = continueOnError
-		noVersion, err := cmd.Flags().GetBool("no-version")
-		if err != nil {
-			logs.Err("There was an error while reading the flag 'no-version':", err)
-		}
-		seperator, err := cmd.Flags().GetString("seperator")
-		if err != nil {
-			logs.Err("There was an error while reading the flag 'seperator':", err)
-		}
+		logs.ContinueOnError = conf.ContinueOnError
 		// fmt.Println("Format: <app>[==<installedVersion>]")
-		apps.List(appsDirPath, versionsFilePath, noVersion, seperator, verbose)
+		apps.List(conf)
 	},
 }
 
@@ -43,4 +36,7 @@ func init() {
 
 	listCmd.Flags().Bool("no-version", false, "Don't show versions of apps.")
 	listCmd.Flags().String("seperator", "\n", "Change seperator, default to \\n.")
+
+	viper.BindPFlags(listCmd.Flags())
+	viper.UnmarshalExact(&conf)
 }

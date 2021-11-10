@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
@@ -16,13 +17,13 @@ var validateCmd = &cobra.Command{
 	eac validate app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logs.ContinueOnError = continueOnError
+		logs.ContinueOnError = conf.ContinueOnError
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
 			logs.Err("There was an error while reading the flag 'platform':", err)
 		}
 
-		apps.Validate(args, flaggedPlatforms, appsDirPath, verbose, versionsFilePath)
+		apps.Validate(args, flaggedPlatforms, conf.AppsDirPath, conf.Verbose, conf.VersionsFilePath)
 	},
 }
 
@@ -40,4 +41,7 @@ func init() {
 	// validateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	validateCmd.Flags().StringSliceP("platform", "p", []string{}, "Only create demo files for specified platforms. Valid options are ["+strings.Join(apps.ValidPlatforms(), "|")+"]")
+
+	viper.BindPFlags(validateCmd.Flags())
+	viper.UnmarshalExact(&conf)
 }

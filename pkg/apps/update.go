@@ -1,8 +1,7 @@
 package apps
 
 import (
-	"runtime"
-
+	"github.com/thetillhoff/eac/internal/appVersions"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
@@ -11,6 +10,6 @@ func Update(appNames []string, appsDirPath string, versionsFilePath string, dryR
 	apps := apps(appNames, versionsFilePath)
 
 	for _, appItem := range apps {
-		_ = updateAppVersion(appItem, appsDirPath, runtime.GOOS, versionsFilePath)
+		_ = appVersions.Update(appItem)
 	}
 }

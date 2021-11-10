@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
@@ -14,8 +15,8 @@ var uninstallCmd = &cobra.Command{
 	eac update app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logs.ContinueOnError = continueOnError
-		apps.Uninstall(args, appsDirPath, verbose, versionsFilePath) // Uninstall apps
+		logs.ContinueOnError = conf.ContinueOnError
+		apps.Uninstall(args, conf.AppsDirPath, conf.Verbose, conf.VersionsFilePath) // Uninstall apps
 	},
 }
 
@@ -31,6 +32,9 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// uninstallCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	viper.BindPFlags(uninstallCmd.Flags())
+	viper.UnmarshalExact(&conf)
 
 	//TODO: uninstallCmd.Flags().Bool("force", false, "Force uninstallation of *all* apps. Use with caution.")
 }

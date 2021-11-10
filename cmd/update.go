@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
@@ -14,7 +15,7 @@ var updateCmd = &cobra.Command{
 	eac update app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logs.ContinueOnError = continueOnError
+		logs.ContinueOnError = conf.ContinueOnError
 		dryRun, err := cmd.Flags().GetBool("dry-run")
 		if err != nil {
 			logs.Err("There was an error while reading the flag 'dry-run':", err)
@@ -23,7 +24,7 @@ var updateCmd = &cobra.Command{
 		if err != nil {
 			logs.Err("There was an error while reading the flag 'skip-local':", err)
 		}
-		apps.Update(args, appsDirPath, versionsFilePath, dryRun, skipLocal, verbose)
+		apps.Update(args, conf.AppsDirPath, conf.VersionsFilePath, dryRun, skipLocal, conf.Verbose)
 	},
 }
 
@@ -40,7 +41,11 @@ func init() {
 	// is called directly, e.g.:
 	// updateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	updateCmd.Flags().Bool("dry-run", false, "Output potential upgrades, but don't make them.")
-	updateCmd.Flags().Bool("skip-local", false, "Skip checking local version.")
+	updateCmd.PersistentFlags().BoolVar(&conf.UpdateConfig.DryRun, "dry-run", conf.UpdateConfig.DryRun, "Output potential upgrades, but don't make them.")
+	updateCmd.PersistentFlags().BoolVar(&conf.UpdateConfig.SkipLocal, "skip-local", conf.UpdateConfig.SkipLocal, "Skip checking local version.")
+
+	viper.BindPFlags(updateCmd.Flags())
+	viper.UnmarshalExact(&conf)
+
 	//TODO --dry-run: don't store/update version in settings.yaml. Only makes sense when combined with some install option. Maybe `install --update --no-save-version` or `install --latest --no-save-version`?
 }

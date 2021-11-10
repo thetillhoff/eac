@@ -4,27 +4,26 @@ import (
 	"strings"
 
 	"github.com/thetillhoff/eac/internal/app"
-	"github.com/thetillhoff/eac/pkg/logs"
+	"github.com/thetillhoff/eac/internal/appVersions"
 )
 
 func apps(appNames []string, versionsFilePath string) []app.App {
 	apps := []app.App{}
 
-	loadVersions(versionsFilePath)
+	appVersions.Load(versionsFilePath)
 
-	for _, arg := range appNames {
+	for _, appName := range appNames {
 		wantedVersion := ""
-		if strings.Contains(arg, "=") {
-			splitted := strings.Split(arg, "=")
-			arg, wantedVersion = splitted[0], splitted[1]
+		if strings.Contains(appName, "=") {
+			splitted := strings.Split(appName, "=")
+			appName, wantedVersion = splitted[0], splitted[1]
 		}
 		if wantedVersion == "" { // if wantedVersion is not set via `<app>=<version>`
-			wantedVersion = getVersion(arg) // retrieve wantedVersion from file
+			wantedVersion = appVersions.GetVersion(appName) // retrieve wantedVersion from file
 		}
 
-		//TOOD if wantedVersion is empty when installing, retrieve latest version first
-		appItem := newApp(arg, app.WantedVersion(wantedVersion))
-		logs.Info("app:", appItem)
+		//TODO If wantedVersion is empty when installing, retrieve latest version first
+		appItem := newApp(appName, app.WantedVersion(wantedVersion))
 
 		apps = append(apps, appItem)
 	}

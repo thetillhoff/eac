@@ -5,28 +5,35 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/thetillhoff/eac/internal/config"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func List(appsDirPath string, versionsFilePath string, noVersion bool, seperator string, verbose bool) {
-	logs.Verbose = verbose
-	appsDirContents, err := ioutil.ReadDir(appsDirPath)
+func List(conf config.Config) {
+	var (
+		appNames []string = []string{}
+	)
+
+	logs.Verbose = conf.Verbose
+
+	// Get contents of appsDir
+	appsDirContents, err := ioutil.ReadDir(conf.AppsDirPath)
 	if err != nil {
-		logs.Err("There was an error while reading from appsDir at '"+appsDirPath+"':", false, err) // continueOnError set to false, as this the whole command won't work then
+		logs.Err("There was an error while reading from appsDir at '"+conf.AppsDirPath+"'. Did you run `eac init` already?", err)
 	}
-	appNames := []string{}
+
 	for _, contentItem := range appsDirContents {
 		appNames = append(appNames, contentItem.Name())
 	}
-	apps := apps(appNames, versionsFilePath) // continueOnError set to false, as this the whole command won't work then
+	apps := apps(appNames, conf.VersionsFilePath) // continueOnError set to false, as this the whole command won't work then
 
 	items := []string{}
 	for _, appItem := range apps {
-		if noVersion || appItem.LocalVersion(appsDirPath) == "" { // if no version should be displayed or no version is installed
+		if conf.NoVersion || appItem.LocalVersion(conf.AppsDirPath) == "" { // if no version should be displayed or no version is installed
 			items = append(items, appItem.Name)
 		} else {
-			items = append(items, appItem.Name+"=="+appItem.LocalVersion(appsDirPath))
+			items = append(items, appItem.Name+"=="+appItem.LocalVersion(conf.AppsDirPath))
 		}
 	}
-	fmt.Println(strings.Join(items, seperator))
+	fmt.Println(strings.Join(items, conf.Seperator))
 }

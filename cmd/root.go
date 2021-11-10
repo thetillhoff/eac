@@ -3,22 +3,48 @@ package cmd
 import (
 	"os"
 	"path"
+	"runtime"
 
 	"github.com/spf13/cobra"
+	"github.com/thetillhoff/eac/internal/config"
 	"github.com/thetillhoff/eac/pkg/logs"
 
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
 var (
-	cfgFile          string
-	VersionString    string = "0.0.0" // Override at compile time with "-ldflags '-X github.com/thetillhoff/eac/cmd.VersionString=1.2.3'"
-	continueOnError  bool
-	verbose          bool
-	eacDirPath       string
-	appsDirPath      string
-	versionsFilePath string
+	cfgFile       string
+	VersionString string        = "0.0.0" // Override at compile time with "-ldflags '-X github.com/thetillhoff/eac/cmd.VersionString=1.2.3'"
+	conf          config.Config = config.Config{
+		ContinueOnError:  false,
+		Platforms:        []string{runtime.GOOS},
+		Verbose:          false,
+		UserHomeDir:      "", // Set during init
+		EacDirPath:       "", // Set during init
+		AppsDirPath:      "", // Set during init
+		VersionsFilePath: "", // Set during init
+		ConfigureConfig:  config.ConfigureConfig{},
+		CreateConfig: config.CreateConfig{
+			GitHubUser: "",
+		},
+		DeleteConfig: config.DeleteConfig{},
+		InitConfig:   config.InitConfig{},
+		InstallConfig: config.InstallConfig{
+			NoConfiguration: false,
+			Update:          false,
+			Latest:          false,
+		},
+		ListConfig: config.ListConfig{
+			NoVersion: false,
+			Seperator: "\n",
+		},
+		UninstallConfig: config.UninstallConfig{},
+		UpdateConfig: config.UpdateConfig{
+			DryRun:    false,
+			SkipLocal: false,
+		},
+		ValidateConfig: config.ValidateConfig{},
+	}
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -46,38 +72,33 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file location, defaults to $HOME/.eac.yaml")
-	rootCmd.PersistentFlags().StringVarP(&appsDirPath, "appsDirPath", "a", appsDirPath, "Override location of apps, defaults to ./apps/")
-	rootCmd.PersistentFlags().BoolVar(&continueOnError, "continue-on-error", false, "Continue with other tasks even on failures, defaults to false")
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Display more information during command execution, defaults to false")
+	rootCmd.PersistentFlags().StringVarP(&conf.AppsDirPath, "apps-dir", "a", conf.AppsDirPath, "Override location of apps, defaults to ~/.eac/apps/")
+	rootCmd.PersistentFlags().BoolVar(&conf.ContinueOnError, "continue-on-error", false, "Continue with other tasks even on failures, defaults to false")
+	rootCmd.PersistentFlags().BoolVarP(&conf.Verbose, "verbose", "v", false, "Display more information during command execution, defaults to false")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
-	// Set the default paths
-	userHomeDir, err := os.UserHomeDir()
-	if err != nil {
-		logs.Err("Can't retrieve userHomeDir", err)
-	}
-	eacDirPath = path.Join(userHomeDir, ".eac")
-	appsDirPath = path.Join(eacDirPath, "apps")
-	versionsFilePath = path.Join(eacDirPath, "versions.yaml")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		cobra.CheckErr(err)
+	var (
+		err error
+	)
 
-		// Search config in home directory with name ".eac" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".eac")
+	// Set the defaults
+	conf.UserHomeDir, err = os.UserHomeDir()
+	if err != nil {
+		logs.Err("Can't retrieve userHomeDir", err)
 	}
+	conf.EacDirPath = path.Join(conf.UserHomeDir, ".eac")
+	conf.AppsDirPath = path.Join(conf.UserHomeDir, ".eac", "apps")
+	conf.VersionsFilePath = path.Join(conf.EacDirPath, "versions.yaml")
+
+	// Search config in home directory with name ".eac.yaml".
+	viper.AddConfigPath(conf.UserHomeDir)
+	viper.SetConfigName(".eac.yaml")
 
 	viper.AutomaticEnv() // read in environment variables that match
 
@@ -85,4 +106,7 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		logs.Info("Using config file:", viper.ConfigFileUsed())
 	}
+
+	viper.BindPFlags(rootCmd.Flags())
+	viper.UnmarshalExact(&conf)
 }

@@ -21,11 +21,13 @@ func (app App) LocalVersion(appsDirPath string) string {
 			localVersion = ""
 		}
 		if strings.Contains(localVersion, app.Name+": not found") {
-			logs.Warn("App '" + app.Name + "' is not installed.")
+			logs.Info("App '" + app.Name + "' is not installed.")
 			localVersion = ""
 		}
-		app.localVersion = localVersion
-		logs.Info("Updated localVersion for app '" + app.Name + "'.")
+		if app.localVersion != localVersion {
+			app.localVersion = localVersion
+			logs.Info("Updated localVersion for app '" + app.Name + "'.")
+		}
 	}
 	return app.localVersion
 }

@@ -1,10 +1,10 @@
 package cmd
 
 import (
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
-
-	"github.com/spf13/cobra"
 )
 
 // installCmd represents the install command
@@ -15,21 +15,9 @@ var installCmd = &cobra.Command{
 	eac install app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logs.ContinueOnError = continueOnError
-		noConfigure, err := cmd.Flags().GetBool("no-configure")
-		if err != nil {
-			logs.Err("There was an error while reading the flag 'no-configure':", err)
-		}
-		update, err := cmd.Flags().GetBool("update")
-		if err != nil {
-			logs.Err("There was an error while reading the flag 'update':", err)
-		}
-		latest, err := cmd.Flags().GetBool("latest")
-		if err != nil {
-			logs.Err("There was an error while reading the flag 'latest':", err)
-		}
+		logs.ContinueOnError = conf.ContinueOnError
 
-		apps.Install(args, noConfigure, update, appsDirPath, versionsFilePath, latest, verbose) // Install apps
+		apps.Install(args, conf) // Install apps
 	},
 }
 
@@ -46,10 +34,13 @@ func init() {
 	// is called directly, e.g.:
 	// installCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	installCmd.Flags().Bool("no-configure", false, "Don't run app configuration after their installation")
+	installCmd.Flags().Bool("no-config", false, "Don't run app configuration after their installation")
 	installCmd.Flags().BoolP("update", "u", false, "Update app versions before installation")
 
 	installCmd.Flags().BoolP("latest", "l", false, "Install latest versions of apps, no matter which versions are specified anywhere.")
 
-	//TODO add flag for multiple versionsFilePaths
+	viper.BindPFlags(installCmd.Flags())
+	viper.UnmarshalExact(&conf)
+
+	//TODO add flag for multiple versionsFilePaths that override each other
 }

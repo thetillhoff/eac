@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/thetillhoff/eac/internal/templates"
+	"github.com/spf13/viper"
 )
 
 // testCmd represents the test command
@@ -35,7 +35,9 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("test called")
 
-		fmt.Println(templates.GetPlatforms())
+		fmt.Println(conf)
+
+		// fmt.Println(templates.GetPlatforms())
 	},
 }
 
@@ -51,4 +53,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// testCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	viper.BindPFlags(testCmd.Flags())
+	viper.UnmarshalExact(&conf)
 }

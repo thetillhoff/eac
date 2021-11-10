@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/thetillhoff/eac/pkg/apps"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
@@ -14,8 +15,8 @@ var configureCmd = &cobra.Command{
 	eac configure app1 app2 app3`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logs.ContinueOnError = continueOnError
-		apps.Configure(args, appsDirPath, verbose, true, versionsFilePath) // checkLocalVersion by default
+		logs.ContinueOnError = conf.ContinueOnError
+		apps.Configure(args, conf.AppsDirPath, conf.Verbose, true, conf.VersionsFilePath) // checkLocalVersion by default
 	},
 }
 
@@ -31,4 +32,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// configureCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	viper.BindPFlags(configureCmd.Flags())
+	viper.UnmarshalExact(&conf)
 }
