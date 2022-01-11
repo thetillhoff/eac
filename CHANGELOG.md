@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v0.0.4 on 2022-01-11
+- `install` now properly downloads app manifests, instead of only a subset
+
 ## v0.0.3 on 2022-01-11
 - `install` now downloads app manifests automatically
 - under the hood there was a truckload of changes and minor adjustments
