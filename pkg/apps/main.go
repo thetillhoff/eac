@@ -1,6 +1,6 @@
 package apps
 
-import "github.com/thetillhoff/eac/internal/appVersions"
+import "github.com/thetillhoff/eac/pkg/apps/internal/appVersions"
 
 var (
 	AppsDirPath      string

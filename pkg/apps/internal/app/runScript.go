@@ -27,7 +27,7 @@ func RunScript(appName string, appsDirPath string, platform string, script strin
 	out := strings.TrimSuffix(string(outBytes), "\n")
 	if err != nil {
 		deleteTmpFolder(tmpFolder)
-		logs.Err("Failed to run script '"+script+"':", out, err)
+		logs.Error("Failed to run script '"+script+"':", out, err)
 	}
 
 	deleteTmpFolder(tmpFolder)

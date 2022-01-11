@@ -14,7 +14,7 @@ func createTmpFolder() string {
 
 	err := os.Mkdir(tmpFolder, os.ModePerm)
 	if err != nil {
-		logs.Err("Failed to create temporary folder:", err)
+		logs.Error("Failed to create temporary folder:", err)
 	}
 	logs.Info("Created temporary folder at " + tmpFolder)
 
@@ -24,7 +24,7 @@ func createTmpFolder() string {
 func deleteTmpFolder(tmpFolder string) {
 	err := os.RemoveAll(tmpFolder)
 	if err != nil {
-		logs.Err("Failed to delete temporary folder:", err)
+		logs.Error("Failed to delete temporary folder:", err)
 	}
 	logs.Info("Deleted temporary folder at " + tmpFolder)
 }

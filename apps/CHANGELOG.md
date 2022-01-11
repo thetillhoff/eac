@@ -1,9 +1,5 @@
 # CHANGELOG
 
-## v0.0.3 on 2022-01-11
-- `install` now downloads app manifests automatically
-- under the hood there was a truckload of changes and minor adjustments
-
 ## v0.0.2 on 2021-09-27
 - instead of previously using a relative path at `./*` for the versionsFile and the appsDir, eac now uses `~/.eac/*`
 - reworked default files structure

@@ -7,32 +7,31 @@ import (
 )
 
 var (
-	//time = color.New(color.Fg)
 	normal = color.New(color.FgWhite)
-	info   = color.New(color.FgGreen)
-	warn   = color.New(color.FgYellow)
-	err    = color.New(color.FgRed)
+	green  = color.New(color.FgGreen)
+	yellow = color.New(color.FgYellow)
+	red    = color.New(color.FgRed)
 
 	ContinueOnError = false
 	Verbose         = false
 )
 
 func Success(message string) {
-	info.Fprint(os.Stdout, "SUC ")
+	green.Fprint(os.Stdout, "SUC ")
 	normal.Fprintln(os.Stdout, message)
 }
 
 func Info(message string, objs ...interface{}) {
 	if Verbose {
-		info.Fprint(os.Stdout, "INF ")
+		green.Fprint(os.Stdout, "INF ")
 		normal.Fprintln(os.Stdout, message)
 		if len(objs) > 0 {
-			normal.Fprintln(os.Stdout, objs)
+			normal.Fprintln(os.Stdout, objs...)
 		}
 	}
 }
 func Warn(message string, objs ...interface{}) {
-	warn.Fprint(os.Stdout, "WRN ")
+	yellow.Fprint(os.Stdout, "WRN ")
 	normal.Fprintln(os.Stdout, message)
 	if len(objs) > 0 {
 		for _, obj := range objs {
@@ -42,8 +41,8 @@ func Warn(message string, objs ...interface{}) {
 		}
 	}
 }
-func Err(message string, objs ...interface{}) {
-	err.Fprint(os.Stderr, "ERR ")
+func Error(message string, objs ...interface{}) {
+	red.Fprint(os.Stderr, "ERR ")
 	normal.Fprintln(os.Stderr, message)
 	if len(objs) > 0 {
 		for _, obj := range objs {

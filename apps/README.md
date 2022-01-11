@@ -18,7 +18,7 @@ My initial draft used ansible (and sadly, I invested so much time and effort tha
 
 > That being said, I do like the things you can do with ansible but you cannot with eac. IMO they have different use-cases.
 
-So when I again searched for some stupid installation commands, I bore the idea to create `eac`.
+So when I again searched for some stupid installation commands, I bore the idea to create eac.
 
 ## The vision
 
@@ -35,29 +35,33 @@ Out of scope is dependency management of any kind.
 
 `eac` stands for `environment-as-code`.
 
-> I (the author) wanted a short name and it should be unique, too. It is about "iac", but that name would not only be confusing but also not properly fitting - eac is only for managing my local _environment_.
+I (the author) wanted a short name and it should be unique, too. It is about "iac", but that name would not only be confusing but also not properly fitting - eac is only for managing my local _environment_.
 
 
 ## The features
 
 ### Everyday features
 
-- [x] `eac init` creates the folder structure (`~/.eac`) and adds the first app: `eac` itself. This includes creating the `versions.yaml` at `~/.apps/versions.yaml`.
-- [x] `eac list` prints all apps that are managed via `eac` (== contained in `versions.yaml`). Per default one app per line in the format `<app>[==<installedVersion>]`. The seperator can be edited with a flag. Created by trying to run the getInstalledVersion script.
-- [x] `eac status` compares the installedVersion and wantedVersion for each app.
-- [ ] `eac install <appname>[==<version>][ <appname>[==<version>]]*` installs the apps with the provided names. If no version for the app is specified in `versions.yaml`, add the newest.
+- [x] `eac init` creates the folder structure (`~/.apps`) and adds the first app: eac itself. This includes creating the `versions.yaml` at `~/.apps/versions.yaml`.
+- [x] `eac list` prints all apps that are managed via `eac` (== contained in `versions.yaml`). Per default one app per line in the format `<app>[==<installedVersion>]`. The seperator can be edited with a flag.
+  - [ ] `eac list local` lists all apps that are available locally.
+  - [ ] `eac list online` lists all apps that are available online.
+  - [ ] `eac list all` lists all apps that are available locally and/or online.
+  - [ ] `eac list installed` lists only the installed apps. Created by trying to run the getLocalVersion script.
+- [ ] `eac status` compares the localVersion and wantedVersion for each app.
+- [ ] `eac install <appname>[==<version>][ <appname>[==<version>]*]` installs the apps with the provided names. If no version for the app is specified in `versions.yaml`, add it.
   - [ ] If not locally available, check whether the repository contains the app. If yes, ask the user to download it automatically and install then. If not, recommend the user to create it with `eac create`. The former can be disabled with `--offline`, the latter with `--no-create`. The repository defaults to `https://github.com/thetillhoff/eac`, but can be overridden with `--repository <url>`.
-  - [ ] `eac install` checks whether all apps are installed as described in `versions.yaml`. If not (or the getInstalledVersion script fails), the app is installed.
+  - [ ] `eac install` checks whether all apps are installed as described in `versions.yaml`. If not (or the getLocalVersion script fails), the app is installed.
   - [ ] `--latest` skips checking the `versions.yaml` and directly retrieves the latest version.
-- [ ] `eac uninstall <appname>[ <appname>]*` uninstalls the apps with the provided names. Removes the version from the `versions.yaml` (if exists).
-- [ ] `eac update[ <appname>]*` checks whether updates for the provided apps are available. If yes, only the version is updated, not the app. If no name is provided, all apps are checked.
-  - [ ] `eac update[ <appname>]*` checks whether updates for the provided apps are available. If yes, the user is asked whether only the version should be updated or the app should be upgraded as well. If no app is provided, all apps are checked.
+- [ ] `eac uninstall <appname>[ <appname>*]` uninstalls the apps with the provided names. Removes the version from the `versions.yaml` (if exists).
+- [ ] `eac update[ <appname>*]` checks whether updates for the provided apps are available. If yes, only the version is updated, not the app. If no name is provided, all apps are checked.
+  - [ ] `eac update[ <appname>*]` checks whether updates for the provided apps are available. If yes, the user is asked whether only the version should be updated or the app should be upgraded as well. If no app is provided, all apps are checked.
   - [ ] `--versions` only updates the version without asking the user.
-- [ ] `eac upgrade[ <appname>]*` checks whether the desired version and the installed version of the provided apps are equal. For each app where this is not the case, install the desired version. Fails if app is not installed.
+- [ ] `eac upgrade[ <appname>*]` checks whether the desired version and the installed version of the provided apps are equal. For each app where this is not the case, install the desired version. Fails if app is not installed.
 
 ### App maintainer features
 
-- [x] `eac create <appname>` creates the default files and folder structure for the new app under `apps`. Without additional flags only default files for the current OS are created.
+- [x] `eac create <appname>` creates the folder structure and default files for the new app under `apps`. Without additional flags only default files for the current OS are created.
   [ ] `--no-default-files` disables creation of default files completely (-> only the folders are created).
   [x] `--platform [linux,darwin,windows,all]` creates the folders and default files for the specified platform(s). Multiple occurances of this flag are possible.
   [x] `--githubUser <githubUser>` adjusts the default files so they fit for github releases. The githubUser is the owner of the repository.

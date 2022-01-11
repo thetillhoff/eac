@@ -9,27 +9,27 @@ import (
 )
 
 // This will either return the local version or an empty string (when the script for getting the local version failed, f.e. if the app is not installed)
-func (app App) LocalVersion(appsDirPath string) string {
+func (app App) InstalledVersion(appsDirPath string) string {
 	var (
-		localVersion string
-		err          error
+		installedVersion string
+		err              error
 	)
-	if app.localVersion == "" {
-		localVersion, err = RunScript(app.Name, appsDirPath, runtime.GOOS, app.getLocalVersionScript)
+	if app.installedVersion == "" {
+		installedVersion, err = RunScript(app.Name, appsDirPath, runtime.GOOS, app.getInstalledVersionScript)
 		if err != nil {
-			logs.Warn("App '"+app.Name+"' is not installed or the getLocalVersion script doesn't work properly.", localVersion, err)
-			localVersion = ""
+			logs.Warn("App '"+app.Name+"' is not installed or the getInstalledVersion script doesn't work properly.", installedVersion, err)
+			installedVersion = ""
 		}
-		if strings.Contains(localVersion, app.Name+": not found") {
+		if strings.Contains(installedVersion, app.Name+": not found") {
 			logs.Info("App '" + app.Name + "' is not installed.")
-			localVersion = ""
+			installedVersion = ""
 		}
-		if app.localVersion != localVersion {
-			app.localVersion = localVersion
-			logs.Info("Updated localVersion for app '" + app.Name + "'.")
+		if app.installedVersion != installedVersion {
+			app.installedVersion = installedVersion
+			logs.Info("Updated installedVersion for app '" + app.Name + "'.")
 		}
 	}
-	return app.localVersion
+	return app.installedVersion
 }
 
 func (app App) LatestVersion(appsDirPath string, platform string) string {
@@ -40,13 +40,13 @@ func (app App) LatestVersion(appsDirPath string, platform string) string {
 	if app.latestVersion == "" {
 		latestVersion, err = RunScript(app.Name, appsDirPath, platform, app.getLatestVersionScript)
 		if err != nil {
-			logs.Err("There was an error while retrieving the latest version of app '"+app.Name+"':", err)
+			logs.Error("There was an error while retrieving the latest version of app '"+app.Name+"':", err)
 			latestVersion = ""
 		}
 		if latestVersion == "" {
-			logs.Err("There was an error while retrieving the latest version of app '"+app.Name+"'.", latestVersion)
+			logs.Error("There was an error while retrieving the latest version of app '"+app.Name+"'.", latestVersion)
 		} else if strings.Contains(latestVersion, "\n") {
-			logs.Err("The latestVersion of app '"+app.Name+"' was not a single line:", latestVersion)
+			logs.Error("The latestVersion of app '"+app.Name+"' was not a single line:", latestVersion)
 		}
 		app.latestVersion = latestVersion
 		logs.Info("Updated latestVersion for app '" + app.Name + "'.")
@@ -58,7 +58,7 @@ func (app App) Install(appsDirPath string, platform string, version string) (App
 	if version == "" && app.WantedVersion == "" {
 		latestVersion := app.LatestVersion(appsDirPath, platform)
 		if latestVersion == "" {
-			logs.Err("There was an error while retrieving the latest version of app '" + app.Name + "'.")
+			logs.Error("There was an error while retrieving the latest version of app '" + app.Name + "'.")
 		}
 		app.WantedVersion = latestVersion
 	}

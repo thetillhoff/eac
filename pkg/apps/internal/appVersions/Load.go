@@ -13,11 +13,11 @@ func Load(versionFilePath string) {
 	var mapObject map[string]interface{}
 	fileContents, err := ioutil.ReadFile(versionFilePath)
 	if err != nil {
-		logs.Err("There was an error while accessing the versionsFile at '"+versionFilePath+"':", err)
+		logs.Error("There was an error while accessing the versionsFile at '"+versionFilePath+"':", err)
 	}
 	err = yaml.Unmarshal(fileContents, &mapObject)
 	if err != nil {
-		logs.Err("There was an error parsing the contents of the versionsfile:", err)
+		logs.Error("There was an error parsing the contents of the versionsfile:", err)
 	}
 
 	checkedMap := map[string]string{}
@@ -26,7 +26,7 @@ func Load(versionFilePath string) {
 		if value, ok := value.(string); ok {
 			checkedMap[key] = value
 		} else {
-			logs.Err("The version '" + value + "' for app '" + key + "' is not a string.")
+			logs.Error("The version '" + value + "' for app '" + key + "' is not a string.")
 		}
 	}
 

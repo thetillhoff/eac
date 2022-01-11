@@ -21,12 +21,12 @@ var createCmd = &cobra.Command{
 		logs.ContinueOnError = conf.ContinueOnError
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'platform':", err)
+			logs.Error("There was an error while reading the flag 'platform':", err)
 		}
 
 		flaggedGithubUser, err := cmd.Flags().GetString("githubUser")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'githubUser':", err)
+			logs.Error("There was an error while reading the flag 'githubUser':", err)
 		}
 
 		createData := map[string]string{}

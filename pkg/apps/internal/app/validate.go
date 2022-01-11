@@ -12,7 +12,7 @@ func (app App) Validate(appsDirPath string, platform string) (string, error) {
 	out := ""
 
 	scriptpaths := []string{}
-	scriptpaths = append(scriptpaths, path.Join(appsDirPath, app.Name, platform, app.getLocalVersionScript))
+	scriptpaths = append(scriptpaths, path.Join(appsDirPath, app.Name, platform, app.getInstalledVersionScript))
 	scriptpaths = append(scriptpaths, path.Join(appsDirPath, app.Name, platform, app.installScript))
 	scriptpaths = append(scriptpaths, path.Join(appsDirPath, app.Name, platform, app.configureScript))
 	scriptpaths = append(scriptpaths, path.Join(appsDirPath, app.Name, platform, app.getLatestVersionScript))
@@ -30,17 +30,17 @@ func (app App) Validate(appsDirPath string, platform string) (string, error) {
 		return "", errors.New(err)
 	}
 
-	localVersion := app.LocalVersion(appsDirPath) // should the app not be installed locally, the this will return an empty string
-	logs.Info("localVersion: ", localVersion)
-	if strings.Contains(localVersion, "\n") {
+	installedVersion := app.InstalledVersion(appsDirPath) // should the app not be installed locally, the this will return an empty string
+	logs.Info("installedVersion: ", installedVersion)
+	if strings.Contains(installedVersion, "\n") {
 		err := "The local version for app '" + app.Name + "' can't be retrieved. The result must be one line, but is:\n"
-		err = err + localVersion
+		err = err + installedVersion
 		return "", errors.New(err)
-	} else if strings.Contains(localVersion, " ") {
+	} else if strings.Contains(installedVersion, " ") {
 		err := "The local version for app '" + app.Name + "' can't be retrieved. The result mustn't contain spaces, but is:\n"
-		err = err + localVersion
+		err = err + installedVersion
 		return "", errors.New(err)
-	} else if localVersion == "" {
+	} else if installedVersion == "" {
 		err := "The local version for app '" + app.Name + "' couldn't be retrieved.\n"
 		return "", errors.New(err)
 	} else {

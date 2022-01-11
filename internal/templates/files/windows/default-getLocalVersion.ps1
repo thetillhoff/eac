@@ -1,1 +1,1 @@
-Write-Host "This script is called to getLocalVersion of app {{ index . "name" }}."
+Write-Host "This script is called to getInstalledVersion of app {{ index . "name" }}."

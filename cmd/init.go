@@ -26,20 +26,20 @@ var initCmd = &cobra.Command{
 		logs.Verbose = conf.Verbose // needs to be done here, the other cmds pass it around
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'platform':", err)
+			logs.Error("There was an error while reading the flag 'platform':", err)
 		}
 
 		// Creating ~/.eac folder
 		if _, err := os.Stat(conf.EacDirPath); os.IsNotExist(err) {
 			err := os.Mkdir(conf.EacDirPath, os.ModePerm)
 			if err != nil {
-				logs.Err("Can't create folder at '"+conf.EacDirPath+"':", err)
+				logs.Error("Can't create folder at '"+conf.EacDirPath+"':", err)
 			}
 			logs.Info("Created folder at '" + conf.EacDirPath + "'.")
 		} else if err == nil {
 			dir, err := os.Open(conf.EacDirPath) // open folder to check if it's empty
 			if err != nil {
-				logs.Err("There was a problem opening folder at '"+conf.EacDirPath+"':", err)
+				logs.Error("There was a problem opening folder at '"+conf.EacDirPath+"':", err)
 			}
 			defer dir.Close()
 
@@ -52,14 +52,14 @@ var initCmd = &cobra.Command{
 				}
 			}
 		} else {
-			logs.Err("There was a problem while accessing folder at '"+conf.EacDirPath+"':", err)
+			logs.Error("There was a problem while accessing folder at '"+conf.EacDirPath+"':", err)
 		}
 
 		// creating versionsFile when not exists
 		if _, err := os.Stat(conf.VersionsFilePath); os.IsNotExist(err) { // check if file exists; if not exists
 			versionsFile, err := os.Create(conf.VersionsFilePath)
 			if err != nil {
-				logs.Err("Couldn't create versionsFile at '"+conf.VersionsFilePath+"':", err)
+				logs.Error("Couldn't create versionsFile at '"+conf.VersionsFilePath+"':", err)
 			} else {
 				logs.Success("Created versionsFile.")
 			}
@@ -72,13 +72,13 @@ var initCmd = &cobra.Command{
 		if _, err := os.Stat(conf.AppsDirPath); os.IsNotExist(err) {
 			err := os.Mkdir(conf.AppsDirPath, os.ModePerm)
 			if err != nil {
-				logs.Err("Couldn't create appsDir at '"+conf.AppsDirPath+"':", err)
+				logs.Error("Couldn't create appsDir at '"+conf.AppsDirPath+"':", err)
 			}
 			logs.Info("Created '" + conf.AppsDirPath + "' folder.")
 		} else if err == nil {
 			appsDir, err := os.Open(conf.AppsDirPath) // open appsDir to check if it's empty
 			if err != nil {
-				logs.Err("There was a problem opening appsDir at '"+conf.AppsDirPath+"':", err)
+				logs.Error("There was a problem opening appsDir at '"+conf.AppsDirPath+"':", err)
 			}
 			defer appsDir.Close()
 
@@ -91,14 +91,14 @@ var initCmd = &cobra.Command{
 				}
 			}
 		} else {
-			logs.Err("There was a problem while accessing appsDir at '"+conf.AppsDirPath+"':", err)
+			logs.Error("There was a problem while accessing appsDir at '"+conf.AppsDirPath+"':", err)
 		}
 
 		// Creating folder for shared scripts
 		if _, err := os.Stat(path.Join(conf.EacDirPath, "shared")); os.IsNotExist(err) {
 			err := os.Mkdir(path.Join(conf.EacDirPath, "shared"), os.ModePerm)
 			if err != nil {
-				logs.Err("Couldn't create appsDir at '"+conf.EacDirPath+"':", err)
+				logs.Error("Couldn't create appsDir at '"+conf.EacDirPath+"':", err)
 			}
 			logs.Info("Created '" + path.Join(conf.EacDirPath, "shared") + "' folder.")
 		} else if err == nil { // Folder is not empty
@@ -106,12 +106,12 @@ var initCmd = &cobra.Command{
 		} else if err == io.EOF { // Folder exists but is empty
 			// Do nothing
 		} else { // Other errors
-			logs.Err("There was a problem while accessing folder at '"+path.Join(conf.EacDirPath, "shared")+"':", err)
+			logs.Error("There was a problem while accessing folder at '"+path.Join(conf.EacDirPath, "shared")+"':", err)
 		}
 
 		// Creating shared scripts
 		for _, sharedFile := range templates.GetSharedFiles() {
-			if _, err := os.Stat(path.Join(conf.EacDirPath, "shared")); os.IsNotExist(err) {
+			if _, err := os.Stat(path.Join(conf.EacDirPath, "shared", strings.TrimPrefix(sharedFile, "shared-"))); os.IsNotExist(err) {
 				templates.WriteTemplateToFile(path.Join(runtime.GOOS, sharedFile), new(interface{}), path.Join(conf.EacDirPath, "shared", strings.TrimPrefix(sharedFile, "shared-")))
 				logs.Info("Created '" + path.Join(conf.EacDirPath, "shared", strings.TrimPrefix(sharedFile, "shared-")) + "' file.")
 			} else {

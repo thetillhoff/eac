@@ -21,7 +21,7 @@ var deleteCmd = &cobra.Command{
 		logs.ContinueOnError = conf.ContinueOnError
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'platform':", err)
+			logs.Error("There was an error while reading the flag 'platform':", err)
 		}
 
 		apps.Delete(args, flaggedPlatforms, conf.AppsDirPath, conf.Verbose)

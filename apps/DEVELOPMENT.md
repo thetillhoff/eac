@@ -12,5 +12,4 @@
 
 ### creation of new commands
 
-`cobra add <command>`
-`cobra add <subcommand> -p '<parentcommand>Cmd'`
+`cobra create <command>`

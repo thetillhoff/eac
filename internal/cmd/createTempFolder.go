@@ -14,7 +14,7 @@ func createTempFolder() string {
 		log.Fatal(err)
 	}
 	if err != nil {
-		logs.Err("Failed to create temporary folder:", err)
+		logs.Error("Failed to create temporary folder:", err)
 	}
 	logs.Info("Created temporary folder at " + tempFolder)
 

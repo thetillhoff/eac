@@ -3,11 +3,13 @@ package apps
 import (
 	"strings"
 
-	"github.com/thetillhoff/eac/internal/app"
-	"github.com/thetillhoff/eac/internal/appVersions"
+	"github.com/thetillhoff/eac/pkg/apps/internal/app"
+	"github.com/thetillhoff/eac/pkg/apps/internal/appVersions"
 )
 
-func apps(appNames []string, versionsFilePath string) []app.App {
+// Parses the provided slice of strings and returns a list of apps.
+// Includes version parsing and retrieval.
+func parseApps(appNames []string, versionsFilePath string) []app.App {
 	apps := []app.App{}
 
 	appVersions.Load(versionsFilePath)

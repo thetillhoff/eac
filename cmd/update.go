@@ -18,11 +18,11 @@ var updateCmd = &cobra.Command{
 		logs.ContinueOnError = conf.ContinueOnError
 		dryRun, err := cmd.Flags().GetBool("dry-run")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'dry-run':", err)
+			logs.Error("There was an error while reading the flag 'dry-run':", err)
 		}
 		skipLocal, err := cmd.Flags().GetBool("skip-local")
 		if err != nil {
-			logs.Err("There was an error while reading the flag 'skip-local':", err)
+			logs.Error("There was an error while reading the flag 'skip-local':", err)
 		}
 		apps.Update(args, conf.AppsDirPath, conf.VersionsFilePath, dryRun, skipLocal, conf.Verbose)
 	},

@@ -1,23 +1,23 @@
 package app
 
 type App struct {
-	Name                   string // name of the app (must be equal to folder name)
-	getLocalVersionScript  string // script that checks whether the app is installed and if yes, in which version
-	installScript          string // script that runs the installation of the app
-	configureScript        string // script that configures the app (if installed)
-	getLatestVersionScript string // script that checks for new versions of the app
-	uninstallScript        string // script that uninstalls the app
-	WantedVersion          string // version of this app, which is desired to be installed
-	localVersion           string // version of this app, which is currently installed
-	latestVersion          string // latest available version of this app
+	Name                      string // name of the app (must be equal to folder name)
+	getInstalledVersionScript string // script that checks whether the app is installed and if yes, in which version
+	installScript             string // script that runs the installation of the app
+	configureScript           string // script that configures the app (if installed)
+	getLatestVersionScript    string // script that checks for new versions of the app
+	uninstallScript           string // script that uninstalls the app
+	WantedVersion             string // version of this app, which is desired to be installed
+	installedVersion          string // version of this app, which is currently installed
+	latestVersion             string // latest available version of this app
 }
 
 type AppOption func(*App)
 
-func GetLocalVersionScript(s string) AppOption {
+func GetInstalledVersionScript(s string) AppOption {
 	return func(a *App) {
 		if s != "" {
-			a.getLocalVersionScript = s
+			a.getInstalledVersionScript = s
 		}
 	}
 }
@@ -61,15 +61,15 @@ func WantedVersion(s string) AppOption {
 func New(appName string, options ...AppOption) *App {
 
 	appItem := &App{ // initialize with default values
-		Name:                   appName,
-		getLocalVersionScript:  "getLocalVersion.sh",
-		installScript:          "install.sh",
-		configureScript:        "configure.sh",
-		getLatestVersionScript: "getLatestVersion.sh",
-		uninstallScript:        "uninstall.sh",
-		WantedVersion:          "",
-		localVersion:           "",
-		latestVersion:          "",
+		Name:                      appName,
+		getInstalledVersionScript: "getInstalledVersion.sh",
+		installScript:             "install.sh",
+		configureScript:           "configure.sh",
+		getLatestVersionScript:    "getLatestVersion.sh",
+		uninstallScript:           "uninstall.sh",
+		WantedVersion:             "",
+		installedVersion:          "",
+		latestVersion:             "",
 	}
 
 	for _, opt := range options { // set custom properties
@@ -83,9 +83,9 @@ func (app App) String() string {
 	appString := ""
 	appString = appString + "Name: " + app.Name + "\n"
 	appString = appString + "WantedVersion: " + app.WantedVersion + "\n"
-	appString = appString + "LocalVersion: " + app.localVersion + "\n"
+	appString = appString + "InstalledVersion: " + app.installedVersion + "\n"
 	appString = appString + "LatestVersion: " + app.latestVersion + "\n"
-	appString = appString + "LocalVersionScript: " + app.getLocalVersionScript + "\n"
+	appString = appString + "InstalledVersionScript: " + app.getInstalledVersionScript + "\n"
 	appString = appString + "LatestVersionScript: " + app.getLatestVersionScript + "\n"
 	appString = appString + "InstallScript: " + app.installScript + "\n"
 	appString = appString + "UninstallScript: " + app.uninstallScript + "\n"

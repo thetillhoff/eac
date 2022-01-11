@@ -90,7 +90,7 @@ func initConfig() {
 	// Set the defaults
 	conf.UserHomeDir, err = os.UserHomeDir()
 	if err != nil {
-		logs.Err("Can't retrieve userHomeDir", err)
+		logs.Error("Can't retrieve userHomeDir", err)
 	}
 	conf.EacDirPath = path.Join(conf.UserHomeDir, ".eac")
 	conf.AppsDirPath = path.Join(conf.UserHomeDir, ".eac", "apps")

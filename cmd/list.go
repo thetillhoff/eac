@@ -16,8 +16,7 @@ var listCmd = &cobra.Command{
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = conf.ContinueOnError
-		// fmt.Println("Format: <app>[==<installedVersion>]")
-		apps.List(conf)
+		apps.PrintList(conf)
 	},
 }
 

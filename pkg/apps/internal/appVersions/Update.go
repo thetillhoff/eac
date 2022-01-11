@@ -5,7 +5,7 @@ import (
 	"runtime"
 
 	"github.com/eiannone/keyboard"
-	"github.com/thetillhoff/eac/internal/app"
+	"github.com/thetillhoff/eac/pkg/apps/internal/app"
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
@@ -13,7 +13,7 @@ func Update(app app.App) app.App {
 	logs.Info("Checking latest " + app.Name + " version ...")
 	latestVersion := app.LatestVersion(AppsDirPath, runtime.GOOS) // retrieve latest Version
 	if latestVersion == "" {
-		logs.Err("Retrieval of latest version for app '"+app.Name+"' failed.", app)
+		logs.Error("Retrieval of latest version for app '"+app.Name+"' failed.", app)
 	}
 	logs.Info("Latest version for app '" + app.Name + "' retrieved:  'v" + latestVersion + "'.")
 
@@ -24,13 +24,13 @@ func Update(app app.App) app.App {
 			fmt.Println("Do you want to update the version of app '" + app.Name + "' from 'v" + app.WantedVersion + "' to latest 'v" + latestVersion + "'? [y/n] ")
 			char, _, err := keyboard.GetSingleKey()
 			if err != nil {
-				logs.Err("There was an error while reading your answer.", err)
+				logs.Error("There was an error while reading your answer.", err)
 			}
 			if char == 'y' {
 				versions[app.Name] = latestVersion
 				app.WantedVersion = latestVersion
 				Save(VersionsFilePath) // write versions in versionsFile
-				logs.Info("Updated version of app '" + app.Name + "' from 'v" + app.LocalVersion(AppsDirPath) + "' to 'v" + latestVersion + "'.")
+				logs.Info("Updated version of app '" + app.Name + "' from 'v" + app.InstalledVersion(AppsDirPath) + "' to 'v" + latestVersion + "'.")
 			} else {
 				logs.Info("Skipped app '" + app.Name + "'.")
 			}
@@ -39,7 +39,7 @@ func Update(app app.App) app.App {
 		fmt.Println("Do you want to set the version of app '" + app.Name + "' to latest v" + latestVersion + "? [y/n] ")
 		char, _, err := keyboard.GetSingleKey()
 		if err != nil {
-			logs.Err("There was an error while reading your answer.", err)
+			logs.Error("There was an error while reading your answer.", err)
 		}
 		if char == 'y' {
 			versions[app.Name] = latestVersion

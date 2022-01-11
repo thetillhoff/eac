@@ -4,9 +4,10 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
+// Checks whether the app configurations are set up in a valid way. TODO what exactly is validated here?
 func Validate(appNames []string, flaggedPlatforms []string, appsDirPath string, verbose bool, versionsFilePath string) {
 	logs.Verbose = verbose
-	apps := apps(appNames, versionsFilePath)
+	apps := parseApps(appNames, versionsFilePath)
 
 	platforms := ResolvePlatforms(flaggedPlatforms)
 	logs.Info("Selected platforms:", platforms)
@@ -16,7 +17,7 @@ func Validate(appNames []string, flaggedPlatforms []string, appsDirPath string, 
 			out, err := appItem.Validate(appsDirPath, platform)
 			logs.Info("Output of validation:", out)
 			if err != nil {
-				logs.Err("There was an error while validating app '"+appItem.Name+"':", err)
+				logs.Error("There was an error while validating app '"+appItem.Name+"':", err)
 			} else {
 				logs.Success("Validation of app '" + appItem.Name + "' successful.")
 			}
