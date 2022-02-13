@@ -20,8 +20,28 @@ func Install(appNames []string, conf config.Config) {
 	//   else skip this app
 
 	for _, appItem := range apps { // for each app
+		logs.Info("Installing app '" + appItem.Name + "'")
 
-		if _, err := os.Stat(path.Join(conf.AppsDirPath, appItem.Name)); os.IsNotExist(err) { // Check if folder for app exists
+		if _, err := os.Stat(path.Join(conf.AppsDirPath, appItem.Name)); os.IsNotExist(err) { // Check if folder for app exists; if not
+			// check if the app is available at the online repository
+			availableApps := listRemote(conf)
+			exists := false
+			for _, appName := range availableApps {
+				if appName == appItem.Name {
+					exists = true
+				}
+			}
+			if !exists {
+				logs.Error(`This app is not managable with eac yet.
+You can create some default files with
+  eac create ` + appItem.Name + `
+and adjust them for the app.
+PRs welcome - to save others time.`)
+				if !conf.ContinueOnError {
+					os.Exit(1)
+				}
+			}
+
 			// create the folder and download the files
 			Create([]string{appItem.Name}, []string{runtime.GOOS}, conf.AppsDirPath, conf.Verbose, map[string]string{})
 			downloadApp(conf, appItem, runtime.GOOS)
