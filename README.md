@@ -44,16 +44,23 @@ Out of scope is dependency management of any kind.
 
 - [x] `eac init` creates the folder structure (`~/.eac`) and adds the first app: `eac` itself. This includes creating the `versions.yaml` at `~/.apps/versions.yaml`.
 - [x] `eac list` prints all apps that are managed via `eac` (== contained in `versions.yaml`). Per default one app per line in the format `<app>[==<installedVersion>]`. The seperator can be edited with a flag. Created by trying to run the getInstalledVersion script.
-- [x] `eac status` compares the installedVersion and wantedVersion for each app.
-- [x] `eac install <appname>[==<version>][ <appname>[==<version>]]*` installs the apps with the provided names. If no version for the app is specified in `versions.yaml`, add the newest.
+- [x] `eac status` compares the installedVersion and wantedVersion for each app and prints them.
+  - [ ] improve description, and what exactly is output - yellow text means update is available, white means latest already.
+- [x] `eac install <appname>[==<version>][ <appname>[==<version>]]*` installs the apps with the provided names.
+  - [x] If no version for the app is specified in `versions.yaml`, add the newest.
   - [x] If not locally available, check whether the repository contains the app. If yes download it automatically and install then. If not, recommend the user to create it with `eac create`.
+  - [ ] If a version is specified in the `<appname>==<version>` format, saves the version to the `versions.yaml`.
   - [ ] `eac install` (no arguments) checks whether all apps are installed as described in `versions.yaml`. If not (or the getInstalledVersion script fails), the app is installed.
-  - [x] `--latest` skips checking the `versions.yaml` and directly retrieves the latest version.
-- [x] `eac uninstall <appname>[ <appname>]*` uninstalls the apps with the provided names. Removes the version from the `versions.yaml` (if exists).
+  - [ ] `--latest` flag skips checking the `versions.yaml` and directly retrieves the latest version. //TODO And saves that version to the `versions.yaml`.
+  - [ ] "implicit" `uninstall` is called before installation. Includes older variants, as done in app `docker`.
+- [x] `eac uninstall <appname>[ <appname>]*` uninstalls the apps with the provided names.
+  - [ ] Removes the version from the `versions.yaml` (if exists).
+  - [ ] ~downloads appfiles automatically as well~
 - [x] `eac update[ <appname>]*` checks whether updates for the provided apps are available. If yes, only the version is updated, not the app.
   - [ ] If no name/argument is provided, all apps are checked.
-  - [ ] `--quiet / -q` updates the version without asking the user.
+  - [ ] `--quiet / -q` updates the version (if necessary) without asking the user.
 - [ ] `eac upgrade[ <appname>]*` checks whether the desired version and the installed version of the provided apps are equal. For each app where this is not the case, install the desired version. Fails if app is not installed.
+- [ ] `eac version` print the current version of `eac`.
 
 ### App maintainer features
 
@@ -122,4 +129,12 @@ Out of scope is dependency management of any kind.
 
 
 ## Other todos
-- make eac use the scripts of the eac version that is installed, not the ones in the mainbranch. Need to think of a solution for how to set a default in the development workflow.
+- Add guideline on how to write scripts for new apps.
+  - [ ] use _shared scripts_
+  - [ ] message before sudo commands
+  - [ ] "silent" `uninstall` is called before installation, so no need to check old stuff implemented the same way.
+  - [ ] `uninstall` should verify whether files/folders exist before attempting to delete them. Only if they exist, anything should be printed.
+- [ ] make eac use the scripts of the eac version that is installed, not the ones in the mainbranch. Need to think of a solution for how to set a default in the development workflow. -> might as well embed the scripts in the `eac` executable...
+  That would also remove lots of filemanagement hassle and update management hassle...
+- [ ] Add autocompletions for bash, zsh (and fish?), depending on whether a .zshrc and a .bashrc exist. Use _shared scripts_ for this.
+- ~`uninstall` should download appfiles automatically as well~
