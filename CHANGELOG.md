@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.0.5 on 2022-02-13
+- bugfixes
+- log improvements
+- `install` no verifies whether the app is available online before trying and failing
+- Added at least one success messag for actions, so commands are never completely silent
+
 ## v0.0.4 on 2022-01-11
 - `install` now properly downloads app manifests, instead of only a subset
 

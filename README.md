@@ -11,23 +11,23 @@ And the worst part of it was to visit each app-homepage again and again to find 
 While searching for the installation instructions for an app once again I wondered if this could be automated.
 My initial draft used ansible (and sadly, I invested so much time and effort that it finally made installations reusable), but it was not the right tool for the task because:
 
-- It's overkill. I don't want to use remoting, I don't want to setup my hostname (at least not initially), ...
+- It's overkill. I don't want to use remote execution, I don't want to setup my hostname (at least not initially), ...
 - It's complicated. I don't want to lookup every damn command in the docs, when all the quick-starts already give me shell-commands to execute.
 - It's time-consuming. I better not think about how much time I've invested in writing ansible-playbooks, just to install some apps (the proper way)...
-- It requires a linux host-system. I do have to use windows for some tasks (or I'm just to lazy to switch the system), and that is a major main. Thankfully chocolatey already heals up half of the pain, but I still rely on too many powershell-scripts... <rant> If you ever develop a windows app, please make sure to at least provide instructions on how to set settings via commandline - and ~please~ don't rely too much on the windows-registry for configs & settings </rant>
+- It requires a linux host-system. I do have to use windows for some tasks (or I'm just too lazy to switch the system), and that is a major pain. Thankfully chocolatey already soothes the pain a bit, but I still rely on too many powershell-scripts... <rant> If you ever develop a windows app, please make sure to at least provide instructions on how to set settings via commandline - and ~please~ don't rely too much on the windows-registry for configs & settings. </rant>
 
 > That being said, I do like the things you can do with ansible but you cannot with eac. IMO they have different use-cases.
 
-So when I again searched for some stupid installation commands, I bore the idea to create `eac`.
+So when I was once again searching for some stupid installation instructions, I bore the idea to create `eac`.
 
 ## The vision
 
-eac's goal is to
-- be a simple app management tool - simple as in simple to understand and simple to use. When the input is ambiguous, ask the user.
-- make it easy to install a specific version of a software.
+`eac`'s goal is to
+- be a simple app management tool - simple as in simple to understand and simple to use. If it's not simple, it's broken.
+- make it easy to install a specific version of a software - as well as latest.
 - make the same apps available on all (or at least the most) platforms in the same way.
-- enable the user to use shell commands (or even better: shell-scripts) for each installation, configuration, uninstallation, ... - The installation-instructions are already given by the app developers, why would you require users to migrate those commands to another format (and then probably format them back for the actual execution)?
-- enable the user to script its usage. It should be easy to use eac in scripts and other tools. All interactive parts must be able to be configured via flags.
+- enable the user to use 'native' scripts for each installation, configuration, uninstallation, ... - The installation instructions are already given by the app developers in that way, why would any tool require you to migrate those commands to another format (and then probably format them back before the actual execution)?
+- enable users to use it in scripts. All interactive parts must be able to be configured via flags.
 
 Out of scope is dependency management of any kind.
 
@@ -35,7 +35,7 @@ Out of scope is dependency management of any kind.
 
 `eac` stands for `environment-as-code`.
 
-> I (the author) wanted a short name and it should be unique, too. It is about "iac", but that name would not only be confusing but also not properly fitting - eac is only for managing my local _environment_.
+> I (the author) wanted a short name and it should be unique, too. It is about "iac", but that name would not only be confusing but also not really fitting - eac is only for managing my local _environment_.
 
 
 ## The features
@@ -45,19 +45,20 @@ Out of scope is dependency management of any kind.
 - [x] `eac init` creates the folder structure (`~/.eac`) and adds the first app: `eac` itself. This includes creating the `versions.yaml` at `~/.apps/versions.yaml`.
 - [x] `eac list` prints all apps that are managed via `eac` (== contained in `versions.yaml`). Per default one app per line in the format `<app>[==<installedVersion>]`. The seperator can be edited with a flag. Created by trying to run the getInstalledVersion script.
 - [x] `eac status` compares the installedVersion and wantedVersion for each app.
-- [ ] `eac install <appname>[==<version>][ <appname>[==<version>]]*` installs the apps with the provided names. If no version for the app is specified in `versions.yaml`, add the newest.
-  - [ ] If not locally available, check whether the repository contains the app. If yes, ask the user to download it automatically and install then. If not, recommend the user to create it with `eac create`. The former can be disabled with `--offline`, the latter with `--no-create`. The repository defaults to `https://github.com/thetillhoff/eac`, but can be overridden with `--repository <url>`.
-  - [ ] `eac install` checks whether all apps are installed as described in `versions.yaml`. If not (or the getInstalledVersion script fails), the app is installed.
-  - [ ] `--latest` skips checking the `versions.yaml` and directly retrieves the latest version.
-- [ ] `eac uninstall <appname>[ <appname>]*` uninstalls the apps with the provided names. Removes the version from the `versions.yaml` (if exists).
-- [ ] `eac update[ <appname>]*` checks whether updates for the provided apps are available. If yes, only the version is updated, not the app. If no name is provided, all apps are checked.
-  - [ ] `eac update[ <appname>]*` checks whether updates for the provided apps are available. If yes, the user is asked whether only the version should be updated or the app should be upgraded as well. If no app is provided, all apps are checked.
-  - [ ] `--versions` only updates the version without asking the user.
+- [x] `eac install <appname>[==<version>][ <appname>[==<version>]]*` installs the apps with the provided names. If no version for the app is specified in `versions.yaml`, add the newest.
+  - [x] If not locally available, check whether the repository contains the app. If yes download it automatically and install then. If not, recommend the user to create it with `eac create`.
+  - [ ] `eac install` (no arguments) checks whether all apps are installed as described in `versions.yaml`. If not (or the getInstalledVersion script fails), the app is installed.
+  - [x] `--latest` skips checking the `versions.yaml` and directly retrieves the latest version.
+- [x] `eac uninstall <appname>[ <appname>]*` uninstalls the apps with the provided names. Removes the version from the `versions.yaml` (if exists).
+- [x] `eac update[ <appname>]*` checks whether updates for the provided apps are available. If yes, only the version is updated, not the app.
+  - [ ] If no name/argument is provided, all apps are checked.
+  - [ ] `--quiet / -q` updates the version without asking the user.
 - [ ] `eac upgrade[ <appname>]*` checks whether the desired version and the installed version of the provided apps are equal. For each app where this is not the case, install the desired version. Fails if app is not installed.
 
 ### App maintainer features
 
 - [x] `eac create <appname>` creates the default files and folder structure for the new app under `apps`. Without additional flags only default files for the current OS are created.
+  [ ] `--force` overwrites existing files
   [ ] `--no-default-files` disables creation of default files completely (-> only the folders are created).
   [x] `--platform [linux,darwin,windows,all]` creates the folders and default files for the specified platform(s). Multiple occurances of this flag are possible.
   [x] `--githubUser <githubUser>` adjusts the default files so they fit for github releases. The githubUser is the owner of the repository.
@@ -118,3 +119,7 @@ Out of scope is dependency management of any kind.
 ## The bugs
 - `~` can't be resolved in the scripts. Use `$HOME` instead.
 - The default script (at least on wsl, untested on others) for script executions is `dash`. So it seems the `shell` param doesn't work properly...
+
+
+## Other todos
+- make eac use the scripts of the eac version that is installed, not the ones in the mainbranch. Need to think of a solution for how to set a default in the development workflow.
