@@ -16,6 +16,7 @@ var installCmd = &cobra.Command{
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = conf.ContinueOnError
+		logs.Verbose = conf.Verbose // needs to be done here, the other cmds pass it around
 
 		apps.Install(args, conf) // Install apps
 	},

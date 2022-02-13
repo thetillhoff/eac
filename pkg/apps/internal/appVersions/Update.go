@@ -11,7 +11,7 @@ import (
 
 func Update(app app.App) app.App {
 	logs.Info("Checking latest " + app.Name + " version ...")
-	latestVersion := app.LatestVersion(AppsDirPath, runtime.GOOS) // retrieve latest Version
+	latestVersion := app.LatestVersion(appsDirPath, runtime.GOOS) // retrieve latest Version
 	if latestVersion == "" {
 		logs.Error("Retrieval of latest version for app '"+app.Name+"' failed.", app)
 	}
@@ -44,8 +44,7 @@ func Update(app app.App) app.App {
 		if char == 'y' {
 			versions[app.Name] = latestVersion
 			app.WantedVersion = latestVersion
-			Save(VersionsFilePath) // write versions in versionsFile
-			logs.Info("Set version of app '" + app.Name + "' to 'v" + latestVersion + "'.")
+			logs.Info("Persisted updated version of app '" + app.Name + "' to 'v" + latestVersion + "'.")
 		} else {
 			logs.Info("Skipped app '" + app.Name + "'.")
 		}

@@ -11,6 +11,7 @@ import (
 func Delete(appNames []string, flaggedPlatforms []string, appsDirPath string, verbose bool) {
 	logs.Verbose = verbose
 	for _, appName := range appNames { // for all apps
+		logs.Info("Deleting app '" + appName + "'")
 		appPath := path.Join(appsDirPath, appName)
 		if _, err := os.Stat(appPath); os.IsNotExist(err) { // if folder doesn't exist
 			logs.Error("Folder '" + appPath + "' for app '" + appName + "' doesn't exist.")

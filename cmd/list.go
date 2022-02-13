@@ -16,6 +16,8 @@ var listCmd = &cobra.Command{
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = conf.ContinueOnError
+		logs.Verbose = conf.Verbose // needs to be done here, the other cmds pass it around
+
 		apps.PrintList(conf)
 	},
 }

@@ -21,6 +21,7 @@ func Create(appNames []string, flaggedPlatforms []string, appsDirPath string, ve
 	}
 
 	for _, appName := range appNames {
+		logs.Info("Creating app '" + appName + "'")
 		appPath := path.Join(appsDirPath, appName)
 		if _, err := os.Stat(appPath); os.IsNotExist(err) { // if folder doesn't exist yet
 			err := os.Mkdir(appPath, os.ModePerm)

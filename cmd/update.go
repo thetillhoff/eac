@@ -16,6 +16,7 @@ var updateCmd = &cobra.Command{
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = conf.ContinueOnError
+		logs.Verbose = conf.Verbose // needs to be done here, the other cmds pass it around
 		dryRun, err := cmd.Flags().GetBool("dry-run")
 		if err != nil {
 			logs.Error("There was an error while reading the flag 'dry-run':", err)

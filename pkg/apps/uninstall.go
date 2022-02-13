@@ -12,6 +12,7 @@ func Uninstall(appNames []string, appsDirPath string, verbose bool, versionsFile
 	apps := parseApps(appNames, versionsFilePath)
 
 	for _, appItem := range apps {
+		logs.Info("Uninstalling app '" + appItem.Name + "'")
 		out, err := appItem.Uninstall(appsDirPath, runtime.GOOS)
 		if err == nil {
 			logs.Success("Uninstalled app '" + appItem.Name + "'.")

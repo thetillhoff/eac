@@ -12,6 +12,7 @@ func Configure(appNames []string, appsDirPath string, verbose bool, checkInstall
 	apps := parseApps(appNames, versionsFilePath)
 
 	for _, appItem := range apps {
+		logs.Info("Configuring app '" + appItem.Name + "'")
 		if checkInstalledVersion {
 			installedVersion := appItem.InstalledVersion(appsDirPath) // test if get-local-version works (to check if app is already installed), if not, fail (with custom error)
 			if installedVersion == "" {

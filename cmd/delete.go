@@ -19,6 +19,7 @@ var deleteCmd = &cobra.Command{
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		logs.ContinueOnError = conf.ContinueOnError
+		logs.Verbose = conf.Verbose // needs to be done here, the other cmds pass it around
 		flaggedPlatforms, err := cmd.Flags().GetStringSlice("platform")
 		if err != nil {
 			logs.Error("There was an error while reading the flag 'platform':", err)

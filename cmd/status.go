@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/thetillhoff/eac/pkg/apps"
+	"github.com/thetillhoff/eac/pkg/logs"
 )
 
 // statusCmd represents the status command
@@ -16,7 +17,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("status called")
+		logs.ContinueOnError = conf.ContinueOnError
+		logs.Verbose = conf.Verbose // needs to be done here, the other cmds pass it around
 
 		apps.PrintStatus(conf)
 
