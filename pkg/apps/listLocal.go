@@ -12,7 +12,7 @@ import (
 // Per default one app per line in the format `<app>[==<installedVersion>]`.
 // The seperator can be edited with a flag and is returned as the second parameter.
 // Created by trying to run the getInstalledVersion script.
-func List(conf config.Config) ([]app.App, config.Config) {
+func listLocal(conf config.Config) ([]app.App, config.Config) {
 	var (
 		appNames []string = []string{}
 	)

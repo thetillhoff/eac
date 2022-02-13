@@ -15,7 +15,7 @@ var (
 )
 
 func PrintStatus(conf config.Config) {
-	apps, _ := List(conf)
+	apps, _ := listLocal(conf)
 
 	for _, app := range apps {
 		fmt.Print(app.Name)
