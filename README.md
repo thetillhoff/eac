@@ -52,23 +52,31 @@ Out of scope is dependency management of any kind.
   - [ ] If a version is specified in the `<appname>==<version>` format, saves the version to the `versions.yaml`.
   - [ ] `eac install` (no arguments) checks whether all apps are installed as described in `versions.yaml`. If not (or the getInstalledVersion script fails), the app is installed.
   - [ ] `--latest` flag skips checking the `versions.yaml` and directly retrieves the latest version. //TODO And saves that version to the `versions.yaml`.
-  - [ ] "implicit" `uninstall` is called before installation. Includes older variants, as done in app `docker`.
 - [x] `eac uninstall <appname>[ <appname>]*` uninstalls the apps with the provided names.
   - [ ] Removes the version from the `versions.yaml` (if exists).
   - [ ] ~downloads appfiles automatically as well~
 - [x] `eac update[ <appname>]*` checks whether updates for the provided apps are available. If yes, only the version is updated, not the app.
+  - [x] `eac update <app>` should not fail if app is not installed. Instead get the latest version and store it to the `versions.yaml`
+    -> Only interact with versions.yaml, no getInstalledVersion.
+    - [ ] add flags `--minor` (implicit patch) and `--patch` to `upgrade` command (no flag: implicit minor and implicit patch)
   - [ ] If no name/argument is provided, all apps are checked.
   - [ ] `--quiet / -q` updates the version (if necessary) without asking the user.
-- [ ] `eac upgrade[ <appname>]*` checks whether the desired version and the installed version of the provided apps are equal. For each app where this is not the case, install the desired version. Fails if app is not installed.
+- [ ] some packages in some installer variants, f.e. golang/docker (not sure) apt-get don't support installing older versions. How should they be treated?
+- [ ] move to per-installer-type installation scripts instead of per-app installation scripts. That hopefully removes redundancy.
 - [ ] `eac version` print the current version of `eac`.
 
 ### App maintainer features
 
-- [x] `eac create <appname>` creates the default files and folder structure for the new app under `apps`. Without additional flags only default files for the current OS are created.
-  [ ] `--force` overwrites existing files
-  [ ] `--no-default-files` disables creation of default files completely (-> only the folders are created).
-  [x] `--platform [linux,darwin,windows,all]` creates the folders and default files for the specified platform(s). Multiple occurances of this flag are possible.
-  [x] `--githubUser <githubUser>` adjusts the default files so they fit for github releases. The githubUser is the owner of the repository.
+- [x] `eac create <appname>` creates the default files and folder structure for the new app. Without additional flags only default files for the current OS are created.
+  - ~`--force` overwrites existing files~ Not needed if the scripts are embedded in the executable.
+  - ~`--no-default-files` disables creation of default files completely (-> only the folders are created).~ Doesn't really make sense. Why would you want that?
+  - [x] `--platform [linux,darwin,windows,all]` creates the folders and default files for the specified platform(s). Multiple occurances of this flag are possible.
+  - [x] `--githubUser <githubUser>` adjusts the default files so they fit for github releases. The githubUser is the owner of the repository.
+  - Add helper-scripts for common installation, getLatest variants: *Check with roadmap before working on it*
+    - [ ] `--apt`: "common/apt-install.sh <package-name> <repo-url> <repo-key-url>"
+    - [ ] `--github`: "common/github-getLatestVersion.sh <repo-owner> <repo-name>"
+    - [ ] Create helpers/scripts/sources folder, where for each type of generic tool scripts can be placed. F.e. github binary release, github tar.gz release, github zip release, apt
+    - [x] Add helper-scripts for common tasks as well: Add to path, remove from path
 - [ ] `eac validate <appname>[ <appname>*]` checks whether the app configurations are set up in a valid way. TODO what exactly is validated here?
 - [x] `eac delete <appname>` deletes the folder structure and all contents for the specified app.
   [x] `--platform [linux,darwin,windows,all]` deletes only the folders and files for the specified platform(s). Multiple occurances of this flag are possible.
@@ -77,64 +85,57 @@ Out of scope is dependency management of any kind.
 
 ## The roadmap
 
-> "My" in the following context means the owner(s)/author(s)/member(s) of this tool. Currently this is only me and I think its easier to write from my point of view anyway.
+> "My" in the following context means the owner(s)/author(s)/member(s) of this tool. Currently this is only me and I think its sometimes easier to write from my point of view.
 
-- `eac install` and `eac upgrade` should uninstall the old version first. At least for golang this is required. On the other hand, this would delete all settings...
-  Maybe this is better added to the install script of the app itself.
-- Add helper-scripts for common installation options, f.e. "common/apt-install.sh <package-name> <repo-url> <repo-key-url>", "common/github-getLatestVersion.sh <repo-owner> <repo-name>". The same could be done for getLatestVersion. This could alternatively  (or additionally) be added as param for create like `eac create <app> --github` or `eac create <app> --apt`.
-  Create helpers/scripts/sources folder, where for each type of generic tool scripts can be placed. F.e. github binary release, github tar.gz release, github zip release, apt
-  Add helper-scripts for common tasks as well: Add to path, remove from path
-- Write down each possible command with description what is does and what it does not.
-- `eac update <app>` should not fail if app is not installed. Instead get the latest version and store it to the versions.yaml
-  Make it possible to upgrade currently not installed apps, without trying to get a local version to compare to. -> compare only against versionsFile
-- Create/add some example apps
-- support minor & major releases - if both is possible, ask the user '(and add potentially a param for that)
-- Add `install --self` and `uninstall --self` commands for eac self-management. (not updating, just plain install & ununstall)
-- check folder `apps` into git, and store all "configured" apps there. Later on, they might be downloaded from there as well.
-- Add Dockercontainer to registry for eac usage.
-- Make it possible to install apps without adding their version to the versionsFile - and with it. (Currently the versionsFile is never edited.) -> --latest
+- Create/add some example apps for each type, good examples so far are:
+  - [ ] docker
+  - [ ] golang
+  - [ ] git
+  - [ ] eac
+- ~Add Dockercontainer to registry for eac usage.~ Not possible, since too many folders would have to be shared with the host.
 - Resolve `//TODO`s. There are quite a lot.
-- add bash/zsh autocompletion
-- `install --tmpFolder` parameter for specifying specific folder. Add checking for already existing files there.
-- Should it be 'appsDirPath/platform/appName' or 'appsDirPath/appName/platform'? Currently it is the latter. // -> might be better, as like this the apps are selfcontained
-- Write (unit) tests.
-- Check & test how eac behaves with settings files.
-- Create github actions for tests, release
-- Create initial release (f.e. 0.0.1).
-- Write proper documentation - as of now, the tool is "self-documenting" as every command has its own help-message and example. Probably not sufficient though.
-- Add `snapshot` command, which tries to gather all installed apps and their respective settings, so the initial setup will be easier and it will simplify migration between machines (limited to the same platform, so switching between linux and windows won't be covered here - sorry). Improvement: exclude an app, only list(==print) found apps.
-- Find a solution for integrating dotfiles and implement it accordingly. -> Actual featureset tbd
-- public repository:
-  - Add `download` command, which downloads the required files and (sane?) default settings for an app you don't already have. Further improvement: Make the download repository flexible via flag. And one more: only download for ~my~ platform (to save some space).
-  - Add `upload` command, which creates a PR at the repository for an previously unexisting app. Again, an additional improvement is to make the repositoy flexible via flag. And also again, add an option to upload only for ~my~ platform because f.e. I might only have this single machine (at hand).
-  - Usefulness:
-    - This will be useful for custom apps, mirroring the repository and potential enterprise blockades like restricted internet access.
-  - Problems:
-    - Different versions of the same app might install completely differently. How to treat backwards compatability?
-    - How to treat authentication? Integrate with github? What about the mirrors?
-    - Who "pulls the trigger" and checks all those PRs? There are way too many apps out there to do this myself.
-      - Codeowners might introduce problems with trust (at least IMO - I know you already have to trust ~me~ - but I'm trustworthy, am I not? ;))
-      - Completely different repos for all apps has to potential to introduce the "which one was it again for this app" bullshit I'm basically trying to solve with this whole tool. It ~could~ be solved with some standardization like f.e. the repo for app 'xyz' has to be at github.com/xyz/xyz, but what happens if this is already taken / containing something else?
-      - Another solution would be to have still completely different repos, which have to register at a/some main repo. This would leave the "base"-trust on my side, and move the actual implementation/review out of my todo.
-      - Either way, some way of signing will be required, to ensure my trust into the repo-owner (or better phrased: my trust into the believe that the repo owner is still the repo owner after a change).
-      - Wouldn't this basically be the same as copying/forking the whole external repo into the main repo? Apart from the storage, that is.
-      - An optimal solution would be to have one (my) main repo, where people can "upload" to (==autocreate PRs for their app), and some form of automation takes place, which will test if it works, and if yes, automatically merge the PR.
-    - How to handle updates?
-    - How does everyone know how to handle settings? Wouldn't this require an additional command `snapshot-settings` or something like that?
-  - Summary: This is a large step and will require quite some time and even more thoughts. For now, I'll leave it as is. This means without any `download` or `upload` commands and without a single source of truth for installing apps. I'll leave it here though, so my future self will know where to continue.
-
-## The bugs
-- `~` can't be resolved in the scripts. Use `$HOME` instead.
-- The default script (at least on wsl, untested on others) for script executions is `dash`. So it seems the `shell` param doesn't work properly...
-
-
-## Other todos
+- [ ] embed the scripts in the executable
+      This ensures eac has a strict set of scripts that might be executed and noone can create an attack surface out of them and
+      enables to use different scripts per branch -> easier development workflow
+- [ ] move from scripts per app to scripts per installer variant (apt, github-binary, github-tar-gz...) *Check with `eac create` before working on it*
+      This removes the hassle of filemanaged hassle on each machine, as well as
+      simplifying how to update the scripts when anything changes in them on the repo side.
+- More tests
+  - [ ] Write more (unit) tests.
+  - [ ] Create github actions for tests
+- [ ] Check & test how `eac` behaves with settings files. (And maybe use it as replacement for the custom config struct?)
+- Add snapshot/restore feature
+  - [ ] `eac snapshot` uses a script `saveSettings` or similar for all apps and zips the result together with the `versions.yaml`. Eases initial setup and migrations between machines (limited to the same platform, so switching between linux and windows won't be covered here - sorry).
+        Only snapshots one platform obviously... maybe add a feature for combining them?
+  - [ ] `--no-settings` so only versions are snapshotted.
+  - [ ] automatically detect if settings for an app exist (== if it is installed?) - if not, don't save the settings instead of failing
+  - [ ] `eac restore` uses a snapshot file and installs all the apps and restores the settings (`restoreSettings` script)
 - Add guideline on how to write scripts for new apps.
   - [ ] use _shared scripts_
   - [ ] message before sudo commands
-  - [ ] "silent" `uninstall` is called before installation, so no need to check old stuff implemented the same way.
+  - [ ] custom uninstall commands can/should be added before installation. Sometimes required, for example for golang. (Don't only overwrite, but clean before.)
+        Can include older variants, as done in app `docker`. Done by each application, so settings are not affected.
   - [ ] `uninstall` should verify whether files/folders exist before attempting to delete them. Only if they exist, anything should be printed.
-- [ ] make eac use the scripts of the eac version that is installed, not the ones in the mainbranch. Need to think of a solution for how to set a default in the development workflow. -> might as well embed the scripts in the `eac` executable...
-  That would also remove lots of filemanagement hassle and update management hassle...
-- [ ] Add autocompletions for bash, zsh (and fish?), depending on whether a .zshrc and a .bashrc exist. Use _shared scripts_ for this.
+
+- Find a solution for integrating dotfiles and implement it accordingly. -> Actual featureset tbd (or is there a tool for this? maybe an idea for my next programming project?)
+- Future problems:
+  - Different versions of the same app might install completely differently. How to treat backwards compatability?
+  - How to treat authentication? Integrate with github? What about (geolocation) distribution mirrors?
+  - How to proceed when there are hundreds of apps managed with `eac` and many changes come in on a daily basis?
+    - Completely different repos for all apps has to potential to introduce the "which one was it again for this app" bullshit `eac` is trying to solve. It _could_ be solved with some standardization like f.e. the repo for app 'xyz' has to be at github.com/xyz/xyz, but what happens if this is already taken / containing something else?
+    - Another solution would be to have still completely different repos, which have to register at the main repo of `eac`. This would leave some basic trust on my side, and move the actual implementation/review out of my responsiblities. Others are using something like _verified_ labels for this, but I'd like to only have verified apps managable by `eac`.
+    - Either way, some way of signing will be required, to ensure my trust into the repo-owner (or better phrased: my trust into the believe that the repo owner is still the repo owner after a change).
+    - Wouldn't this basically be the same as copying/forking the whole external repo into the main repo? Apart from the storage, that is.
+    - An optimal solution would be to have one (my) main repo, where people can "upload" to (==autocreate PRs for their app), and some form of automation takes place, which will test if it works, and if yes, automatically merge the PR.
+    - OR we move to scripts per installer instead of the current scripts per app setup and only manage some metadata per app, like github-repo location, version format and the likes. -> *preferred solution for now*
+
+
+## The bugs
+- `~` can't be resolved in the scripts. Use `$HOME` instead.
+- The default script (at least on wsl, untested on others) for script executions is `dash`. So it seems the `shell` param doesn't work properly... -> removed functionality
+
+
+## Other todos
+
+- [ ] Add autocompletions for bash, zsh (and fish?), depending on whether a .zshrc and a .bashrc exist. (_shared scripts_)
 - ~`uninstall` should download appfiles automatically as well~
