@@ -29,7 +29,7 @@ func Install(appNames []string, conf config.Config) {
 
 		if conf.Latest { // If latest version should be installed
 			if conf.Update {
-				appItem = appVersions.Update(appItem) // Update app version, don't care about currently installed version
+				appItem = appVersions.Update(appItem, conf.AppsDirPath, conf.VersionsFilePath) // Update app version, don't care about currently installed version
 			}
 			appItem.WantedVersion = appItem.LatestVersion(conf.AppsDirPath, runtime.GOOS) // Set WantedVersion to the latest available one
 			appVersions.SetVersion(appItem.Name, appItem.WantedVersion)

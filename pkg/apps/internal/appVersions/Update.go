@@ -9,7 +9,7 @@ import (
 	"github.com/thetillhoff/eac/pkg/logs"
 )
 
-func Update(app app.App) app.App {
+func Update(app app.App, appsDirPath string, versionsFilePath string) app.App {
 	logs.Info("Checking latest " + app.Name + " version ...")
 	latestVersion := app.LatestVersion(appsDirPath, runtime.GOOS) // retrieve latest Version
 	if latestVersion == "" {
@@ -19,7 +19,7 @@ func Update(app app.App) app.App {
 
 	if app.WantedVersion != "" { // if VersionsFile contains a version for app
 		if app.WantedVersion == latestVersion { // if version is already latest
-			logs.Info("Version of app '" + app.Name + "' is already set to latest version (v" + app.WantedVersion + ").")
+			logs.Success("Version of app '" + app.Name + "' is already set to latest version (v" + app.WantedVersion + ").")
 		} else { // if version is set but not latest: ask to upgrade
 			fmt.Println("Do you want to update the version of app '" + app.Name + "' from 'v" + app.WantedVersion + "' to latest 'v" + latestVersion + "'? [y/n] ")
 			char, _, err := keyboard.GetSingleKey()
@@ -29,8 +29,8 @@ func Update(app app.App) app.App {
 			if char == 'y' {
 				versions[app.Name] = latestVersion
 				app.WantedVersion = latestVersion
-				Save(VersionsFilePath) // write versions in versionsFile
-				logs.Info("Updated version of app '" + app.Name + "' from 'v" + app.InstalledVersion(AppsDirPath) + "' to 'v" + latestVersion + "'.")
+				Save(versionsFilePath) // write versions in versionsFile
+				logs.Success("Persisted updated version of app '" + app.Name + "' from 'v" + app.InstalledVersion(appsDirPath) + "' to 'v" + latestVersion + "'.")
 			} else {
 				logs.Info("Skipped app '" + app.Name + "'.")
 			}
@@ -44,6 +44,7 @@ func Update(app app.App) app.App {
 		if char == 'y' {
 			versions[app.Name] = latestVersion
 			app.WantedVersion = latestVersion
+			Save(versionsFilePath) // write versions in versionsFile
 			logs.Info("Persisted updated version of app '" + app.Name + "' to 'v" + latestVersion + "'.")
 		} else {
 			logs.Info("Skipped app '" + app.Name + "'.")
