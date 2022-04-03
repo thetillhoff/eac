@@ -1,24 +1,66 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/thetillhoff/eac/pkg/apps"
-	"github.com/thetillhoff/eac/pkg/logs"
+
+	eac "github.com/thetillhoff/eac/pkg/eac"
 )
 
 // installCmd represents the install command
 var installCmd = &cobra.Command{
 	Use:   "install",
-	Short: "Install and configure specified apps.",
-	Long: `Install one or multiple apps, specified by a space-seperated list of names, f.e.
-	eac install app1 app2 app3`,
-	Args: cobra.MinimumNArgs(1),
+	Short: "Install and configure specified apps",
+	Long: `Install one or multiple apps, specified by a space-seperated list of names with optional versions. Examples:
+	eac install
+  eac install kubectl@1.2.3
+	eac install kubectl terraform`,
 	Run: func(cmd *cobra.Command, args []string) {
-		logs.ContinueOnError = conf.ContinueOnError
-		logs.Verbose = conf.Verbose // needs to be done here, the other cmds pass it around
 
-		apps.Install(args, conf) // Install apps
+		// Passing flags & viper config
+		eac.Verbose = verbose || viper.GetBool("verbose")
+		eac.DryRun = dryRun || viper.GetBool("dry-run")
+
+		if len(args) != 0 { // If apps/versions are already specified explicitely
+			viper.Set("apps", args)
+		} // Else no explicit apps/versions are set use the config file instead
+
+		if len(viper.GetStringSlice("apps")) == 0 { // Neither args nor `~/.eac` specify any apps
+			logger.Fatal("No apps specified")
+		}
+
+		for _, appName := range viper.GetStringSlice("apps") {
+			version := ""
+			if strings.Contains(appName, "@") { // If appName contains '@'
+				parts := strings.Split(appName, "@")
+				if len(parts) > 2 {
+					logger.Fatal("Invalid app " + appName)
+				}
+				appName = parts[0]
+				if !latest && !viper.GetBool("latest") { // If latest is not set on global level
+					version = parts[1]
+				}
+			}
+			if version == "" {
+				version, err = eac.GetLatestVersion(appName)
+				if err != nil {
+					logger.Fatal(err.Error())
+				}
+			}
+
+			err = eac.InstallApp(appName, version)
+			if err != nil {
+				logger.Fatal(err.Error())
+			}
+
+			// err = eac.ConfigureApp(appName, dryRun)
+			// if err != nil {
+			// 	logger.Fatal(err.Error())
+			// }
+		}
+
 	},
 }
 
@@ -35,13 +77,6 @@ func init() {
 	// is called directly, e.g.:
 	// installCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	installCmd.Flags().Bool("no-config", false, "Don't run app configuration after their installation")
-	installCmd.Flags().BoolP("update", "u", false, "Update app versions before installation")
-
-	installCmd.Flags().BoolP("latest", "l", false, "Install latest versions of apps, no matter which versions are specified anywhere.")
-
-	viper.BindPFlags(installCmd.Flags())
-	viper.UnmarshalExact(&conf)
-
-	//TODO add flag for multiple versionsFilePaths that override each other
+	installCmd.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "prepare installation, but skip installation")
+	installCmd.PersistentFlags().BoolVar(&latest, "latest", false, "install latest version for all specified apps")
 }

@@ -1,9 +1,20 @@
 # CHANGELOG
 
+## v1.0.0 on 2022-04-04
+- complete rework of `eac`: Many things were only patchwork-level before, since the vision changed over time. While the new `eac` only supports a handful of apps right now, its architecture is now more stable, safer to use and the app maintenance is way easier.
+- The currently supported apps are:
+  - eac
+  - github-cli
+  - golang
+  - helm
+  - kind
+  - kubectl
+  - terraform
+
 ## v0.0.5 on 2022-02-13
 - bugfixes
 - log improvements
-- `install` no verifies whether the app is available online before trying and failing
+- `install` now verifies whether the app is available online before trying and failing
 - Added at least one success messag for actions, so commands are never completely silent
 
 ## v0.0.4 on 2022-01-11
