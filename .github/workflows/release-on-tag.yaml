@@ -55,10 +55,13 @@ jobs:
         with:
           ref: main
 
-      - name: Set golang version
+      - name: Detect go version
+        run: sed -En 's/^go (.*)$/GO_VERSION=\1/p' go.mod >> $GITHUB_ENV
+
+      - name: Set up golang
         uses: actions/setup-go@v2
         with:
-          go-version: "1.16.3"
+          go-version: "${{ env.GO_VERSION }}"
 
       - name: Compile binary by defined matrix
         shell: bash
