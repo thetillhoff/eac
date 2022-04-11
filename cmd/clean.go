@@ -21,7 +21,7 @@ var cleanCmd = &cobra.Command{
 		eac.Verbose = verbose || viper.GetBool("verbose")
 		eac.DryRun = dryRun || viper.GetBool("dry-run")
 
-		eac.Clean(args)
+		eac.Clean(args...)
 	},
 }
 

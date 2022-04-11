@@ -1,17 +1,17 @@
-package apps
+package eac
 
 import (
 	"fmt"
 
 	"github.com/thetillhoff/eac/pkg/eac/internal/apps"
-	"github.com/thetillhoff/eac/pkg/eac/internal/helpers"
+	"github.com/thetillhoff/eac/pkg/eac/internal/dotProfile"
 )
 
 func ConfigureApp(appName string, dryRun bool) error {
 	var (
-		err    error
-		app    = apps.Apps[appName]
-		exists = false
+		err          error
+		app          = apps.Apps[appName]
+		pathContains = false
 	)
 
 	if app.PathAddition != "" { // TODO Add to path if configured - only if not exists
@@ -20,18 +20,18 @@ func ConfigureApp(appName string, dryRun bool) error {
 			fmt.Println("Checking if envPath needs to be extended...")
 		}
 
-		exists, err = helpers.EnvPathExists(app.PathAddition)
+		pathContains, err = dotProfile.PathContains(app.PathAddition)
 		if err != nil {
 			return err
 		}
 
 		if Verbose {
-			if exists {
+			if pathContains {
 				fmt.Println("Check finished.")
 			}
 		}
 
-		if exists {
+		if pathContains {
 			if Verbose {
 				fmt.Println("Skipped adding to envPath.")
 			}
@@ -40,7 +40,7 @@ func ConfigureApp(appName string, dryRun bool) error {
 				fmt.Println("Adding to envPath...")
 			}
 			if !dryRun {
-				err = helpers.AddToEnvPath(app.PathAddition)
+				err = dotProfile.AddToPath(app.PathAddition)
 				if err != nil {
 					return err
 				}
@@ -57,18 +57,18 @@ func ConfigureApp(appName string, dryRun bool) error {
 				fmt.Println("Checking if profile variable needs to be added...")
 			}
 
-			exists, err = helpers.ProfileVariableExists(profileVariable.Key, profileVariable.Value)
+			pathContains, err = dotProfile.ProfileContainsEnvVariable(profileVariable.Key, profileVariable.Value)
 			if err != nil {
 				return err
 			}
 
 			if Verbose {
-				if exists {
+				if pathContains {
 					fmt.Println("Check finished.")
 				}
 			}
 
-			if exists {
+			if pathContains {
 				if Verbose {
 					fmt.Println("Skipped adding profile variable.")
 				}
@@ -77,7 +77,7 @@ func ConfigureApp(appName string, dryRun bool) error {
 					fmt.Println("Adding profile variable...")
 				}
 				if !dryRun {
-					err = helpers.AddProfileVariable(profileVariable.Key, profileVariable.Value)
+					err = dotProfile.AddEnvVariableToProfile(profileVariable.Key, profileVariable.Value)
 					if err != nil {
 						return err
 					}

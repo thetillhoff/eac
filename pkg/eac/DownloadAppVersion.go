@@ -1,4 +1,4 @@
-package apps
+package eac
 
 import (
 	"fmt"
@@ -14,6 +14,9 @@ import (
 	"github.com/thetillhoff/eac/pkg/unzip"
 )
 
+// Download specific version of specific app.
+// In case of .tar, .tar.gz or .zip files, they are automatically extracted and the archive deleted.
+// Returns filepath of the download or folderpath depending on whether extraction was involved or not.
 func DownloadAppVersion(appName string, version string) (string, error) {
 	var (
 		err          error
@@ -55,7 +58,7 @@ func DownloadAppVersion(appName string, version string) (string, error) {
 			fmt.Println("Download finished.")
 		}
 
-		if app.Checksum.UrlTemplate != "" { // If checksumUrlTemplate is set, verify it
+		if app.Checksum != nil && app.Checksum.UrlTemplate != "" { // If checksumUrlTemplate is set, verify it
 			if Verbose {
 				fmt.Println("Verifying checksum...")
 			}

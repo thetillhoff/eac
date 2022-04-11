@@ -1,5 +1,7 @@
 # `eac`
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/thetillhoff/eac)](https://goreportcard.com/report/github.com/thetillhoff/eac)
+
 This tool helps managing apps on the local machine. Should work platform agnostic, but is only test with linux for now.
 
 ## The story
@@ -115,6 +117,10 @@ You can get all available apps via `eac list available`, but here are some examp
 
 ## How can I add app _xyz_ to `eac`?
 
-The apps are defined in [`/pkg/eac/internal/apps/<appname>.go`](./pkg/eac/internal/apps/). Open a Pull-Request where you add your app there. Don't forget to mention it in the section for the next version in the [`CHANGELOG.md`](./CHANGELOG.md).
+You can always open an GitHub issue with a request.
+
+Apart from that, the apps are defined in [`/pkg/eac/internal/apps/<appname>.go`](./pkg/eac/internal/apps/).
+
+Feel free to open a Pull-Request where you added your app. Don't forget to mention it in the section for the next version in the [`CHANGELOG.md`](./CHANGELOG.md).
 
 For further information, please read [`DEVELOPMENT.md`](./DEVELOPMENT.md).

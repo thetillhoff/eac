@@ -13,7 +13,7 @@ import (
 var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Install and configure specified apps",
-	Long: `Install one or multiple apps, specified by a space-seperated list of names with optional versions. Examples:
+	Long: `Install one or multiple apps, specified by a space-separated list of names with optional versions. Examples:
 	eac install
   eac install kubectl@1.2.3
 	eac install kubectl terraform`,
@@ -23,7 +23,7 @@ var installCmd = &cobra.Command{
 		eac.Verbose = verbose || viper.GetBool("verbose")
 		eac.DryRun = dryRun || viper.GetBool("dry-run")
 
-		if len(args) != 0 { // If apps/versions are already specified explicitely
+		if len(args) != 0 { // If apps/versions are already specified explicitly
 			viper.Set("apps", args)
 		} // Else no explicit apps/versions are set use the config file instead
 

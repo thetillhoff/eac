@@ -1,4 +1,4 @@
-package apps
+package eac
 
 import "github.com/thetillhoff/eac/pkg/eac/internal/apps"
 
