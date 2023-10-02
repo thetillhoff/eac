@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/elgs/gojq v0.0.0-20201120033525-b5293fef2759
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
 	go.uber.org/zap v1.26.0
 )
@@ -13,7 +13,7 @@ require (
 	github.com/elgs/gosplitargs v0.0.0-20161028071935-a491c5eeb3c8 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
