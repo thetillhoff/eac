@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.2.0 on 2023-10-14
+- Update release pipeline
+- Add check pipeline for PRs
+- Adjust version command slightly
+
 ## v0.1.0 on 2022-04-04
 - complete rework of `eac`: Many things were only patchwork-level before, since the vision changed over time. While the new `eac` only supports a handful of apps right now, its architecture is now more stable, safer to use and the app maintenance is way easier.
 - The currently supported apps are:

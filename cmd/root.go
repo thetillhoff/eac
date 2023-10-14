@@ -14,13 +14,12 @@ import (
 )
 
 var (
-	err           error
-	cfgFile       string
-	VersionString string = "0.0.0" // Override at compile time with "-ldflags '-X github.com/thetillhoff/eac/cmd.VersionString=1.2.3'"
-	logger        *zap.Logger
-	verbose       bool
-	dryRun        bool // Only used byg installCmd and cleanCmd
-	latest        bool // Only used by installCmd
+	err     error
+	cfgFile string
+	logger  *zap.Logger
+	verbose bool
+	dryRun  bool // Only used byg installCmd and cleanCmd
+	latest  bool // Only used by installCmd
 )
 
 // rootCmd represents the base command when called without any subcommands
