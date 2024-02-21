@@ -6,7 +6,7 @@ require (
 	github.com/elgs/gojq v0.0.0-20230628214826-df5c4045598e
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.1
-	go.uber.org/zap v1.26.0
+	go.uber.org/zap v1.27.0
 )
 
 require (
