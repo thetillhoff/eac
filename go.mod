@@ -6,7 +6,7 @@ toolchain go1.24.3
 
 require (
 	github.com/elgs/gojq v0.0.0-20230628214826-df5c4045598e
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	go.uber.org/zap v1.27.0
 )
