@@ -2,7 +2,7 @@ module github.com/thetillhoff/eac
 
 go 1.21.0
 
-toolchain go1.24.5
+toolchain go1.25.0
 
 require (
 	github.com/elgs/gojq v0.0.0-20230628214826-df5c4045598e
