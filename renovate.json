@@ -1,7 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "schedule": ["every weekend"],
-  "extends": ["config:base", ":disableDependencyDashboard"],
+  "extends": ["config:recommended", ":disableDependencyDashboard"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
   "postUpdateOptions": ["gomodTidy"],
   "packageRules": [
     {
